@@ -1,0 +1,13 @@
+.linkWrap {
+  display: flex;
+  width: 100%;
+  gap: 0 16px;
+
+  & > div {
+    width: 50%;
+  }
+}
+
+.formFooter footer {
+  margin-top: 10px;
+}

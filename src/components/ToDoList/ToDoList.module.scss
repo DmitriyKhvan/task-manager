@@ -1,0 +1,37 @@
+.wrapToDoContainer {
+  margin-top: 32px;
+  height: calc(100vh - 223px);
+  overflow: auto;
+
+  .toDoContainer {
+    display: flex;
+    user-select: none;
+    padding: 0 30px;
+    width: fit-content;
+  }
+
+  .leftMargin,
+  .rightMargin {
+    background: #fff;
+    position: sticky;
+    width: 40px;
+    z-index: 10;
+  }
+
+  .leftMargin {
+    left: 0;
+    margin-left: -35px;
+
+    .add {
+      box-shadow: 0 80px 0 #ffffff, 5px -2px 7px rgba(9, 30, 66, 0.08);
+    }
+  }
+
+  .rightMargin {
+    right: 0;
+    margin-right: -35px;
+    .add {
+      box-shadow: 0 80px 0 #ffffff, -5px -2px 7px rgba(9, 30, 66, 0.08);
+    }
+  }
+}

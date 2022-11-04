@@ -1,0 +1,62 @@
+.customEditorStyle {
+  margin-top: 10px;
+
+  .activity {
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+
+  .addCommentBlock {
+    display: flex;
+    padding: 16px 0;
+    margin-top: 8px;
+
+    .avatarComment {
+      margin-right: 12px;
+      margin-top: 2px;
+    }
+
+    .addCommentEditor {
+      flex-grow: 1;
+    }
+
+    .addComment {
+      text-align: left;
+      background-color: white;
+      border: 1px solid #dfe1e6;
+      border-radius: 3px;
+      box-sizing: border-box;
+      height: 40px;
+      padding-left: 20px;
+      // padding-top: 12px;
+      // padding-bottom: 12px;
+      font-size: 0.875rem;
+      width: 100%;
+      font-weight: 400;
+      line-height: 1.42857;
+      letter-spacing: -0.005em;
+      color: #5e6c84;
+
+      &:hover {
+        border-color: #c1c7d0;
+        cursor: text;
+      }
+    }
+  }
+
+  .rdw-editor-toolbar {
+    margin-bottom: 0;
+  }
+
+  .demo-editor {
+    border: 1px solid #f1f1f1;
+  }
+
+  .public-DraftStyleDefault-block {
+    margin: 1em;
+  }
+
+  .commentGroupBtns {
+    padding: 12px 1px;
+  }
+}

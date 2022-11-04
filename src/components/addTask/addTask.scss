@@ -1,0 +1,14 @@
+.textAreaWrap {
+  // margin-top: 4px;
+  .addBtn {
+    font-size: 14px;
+    &:hover {
+      background: none;
+    }
+
+    &.opacityBtn {
+      // transition: opacity 0.3s ease;
+      opacity: 0;
+    }
+  }
+}

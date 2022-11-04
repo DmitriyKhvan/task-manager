@@ -1,0 +1,34 @@
+.formSectionWrap {
+  margin-top: 16px;
+  .textfieldWrap {
+    display: flex;
+    justify-content: space-between;
+
+    .textfield {
+      input {
+        padding: 4px 6px;
+        height: 2em;
+      }
+    }
+
+    .resetLimit {
+      margin-left: 8px;
+    }
+
+    .mocDiv {
+      height: 16px;
+      margin-top: 4px;
+    }
+  }
+}
+
+.btns {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin: 14px 0 20px;
+
+  button {
+    margin-left: 8px;
+  }
+}

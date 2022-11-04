@@ -1,0 +1,122 @@
+// @import url(./assets/react-draft-wysiwyg.css);
+// @import url(./assets/react-draft-wysiwyg.css.map);
+@import url(./assets/iconFiles.css);
+
+#root {
+  height: 100vh;
+  overflow: hidden;
+}
+
+#confluence-navigation {
+  z-index: 70;
+}
+
+button {
+  user-select: none !important;
+}
+
+.taskMenu {
+  &::before,
+  &::after {
+    height: 0 !important;
+  }
+
+  div[aria-label] {
+    &::before,
+    &::after {
+      height: 4px !important;
+    }
+  }
+
+  div[data-ds--menu--heading-item] {
+    margin: 0;
+    padding: 8px 12px;
+    font-weight: normal;
+    line-height: 1;
+
+    &:first-of-type {
+      margin: 0;
+    }
+  }
+  button {
+    min-height: auto;
+    padding: 8px 12px;
+
+    & span span {
+      line-height: 1.14286;
+    }
+  }
+
+  .titleWrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0 5px;
+    height: 48px;
+
+    &:hover .dropmenuTitle button[aria-expanded="false"] {
+      opacity: 1;
+    }
+  }
+
+  &.add {
+    button {
+      padding: 0 12px;
+
+      span {
+        margin-right: 0px;
+      }
+    }
+  }
+}
+
+#project-navigation {
+  z-index: 60;
+}
+
+@keyframes outline-pulsate {
+  0% {
+    outline: 1px solid rgba(56, 180, 77, 0);
+  }
+  10% {
+    outline: 2px solid rgba(56, 180, 77, 0.45);
+  }
+  20% {
+    outline: 3px solid rgba(56, 180, 77, 0.6);
+  }
+  30% {
+    outline: 4px solid rgba(56, 180, 77, 0.75);
+  }
+  40% {
+    outline: 5px solid rgba(56, 180, 77, 0.9);
+  }
+  50% {
+    outline: 6px solid rgba(56, 180, 77, 1);
+  }
+  60% {
+    outline: 7px solid rgba(56, 180, 77, 0.9);
+  }
+  70% {
+    outline: 8px solid rgba(56, 180, 77, 0.75);
+  }
+  80% {
+    outline: 9px solid rgba(56, 180, 77, 0.6);
+  }
+  90% {
+    outline: 10px solid rgba(56, 180, 127, 0.45);
+  }
+  100% {
+    outline-color: rgba(56, 180, 127, 0);
+    outline: 11px solid transparent;
+  }
+}
+
+.active,
+.done {
+  border-radius: 3px;
+  outline: 1px solid rgba(56, 180, 127, 0);
+  animation: outline-pulsate 0.5s 1;
+  position: relative;
+  z-index: 1000;
+}

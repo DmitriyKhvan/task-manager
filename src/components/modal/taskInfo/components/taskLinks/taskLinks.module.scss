@@ -1,0 +1,102 @@
+.taskLinksWrap {
+  margin-top: 40px;
+  .titleTaskLinks {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+
+    h4 {
+      font-size: 14px;
+    }
+
+    .addTaskLink {
+      width: 1.71429em;
+      height: 1.71429em;
+    }
+  }
+
+  .taskLinks {
+    padding: 0;
+    margin: 0;
+
+    box-shadow: 0 1px 1px rgba(9, 30, 66, 0.25),
+      0 0 1px 1px rgba(9, 30, 66, 0.13);
+    background: #fafbfc;
+    border-radius: 3px;
+    padding: 2px 0;
+    margin-left: 1px;
+    margin-right: 1px;
+    .item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      list-style: none;
+
+      background: #ffffff;
+      border-radius: 3px;
+      cursor: pointer;
+      position: relative;
+      height: 40px;
+      padding: 0px 6px;
+      margin: 0px 2px;
+      border-bottom: 1px solid #ebecf0;
+
+      &:hover {
+        background: #ebecf0;
+      }
+
+      &:hover .removeLink {
+        display: flex;
+        width: 1.71429em;
+        height: 1.71429em;
+        align-items: center;
+        justify-content: center;
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .removeLink {
+        display: none;
+      }
+
+      .itemLink {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        color: #091e42;
+        width: 100%;
+
+        .textLink {
+          padding-left: 8px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          margin: 0;
+          flex-grow: 1;
+        }
+      }
+
+      .iconLinkWrap {
+        height: 24px;
+        width: 24px;
+        background: #fff;
+        display: flex;
+        border-radius: 2px;
+        padding: 2px;
+        .iconLink {
+          height: 100%;
+          width: 100%;
+          display: flex;
+          flex: 1 1 100%;
+          background-color: transparent;
+          background-position: center center;
+          background-repeat: no-repeat;
+          background-size: cover;
+        }
+      }
+    }
+  }
+}

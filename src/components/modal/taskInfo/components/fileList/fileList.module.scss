@@ -1,0 +1,195 @@
+.fileListTitleBlock {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  .fileListTitle {
+    font-size: 14px;
+  }
+
+  .funcBlock {
+    display: flex;
+    align-items: center;
+
+    form {
+      margin: 0;
+    }
+  }
+
+  .addFileMenu,
+  .addFiles button {
+    width: 24px;
+    height: 24px;
+  }
+
+  .addFileMenu {
+    margin-right: 5px;
+
+    &[aria-expanded="false"] {
+      background: transparent;
+
+      &:hover {
+        background: rgba(9, 30, 66, 0.08);
+      }
+    }
+  }
+}
+
+.fileList {
+  padding: 4px;
+
+  table {
+    margin-bottom: 24px;
+  }
+
+  tr {
+    cursor: pointer;
+  }
+
+  th {
+    vertical-align: top;
+    & > span {
+      position: relative;
+
+      &::after {
+        content: "";
+        display: block;
+        position: absolute;
+        right: -8px;
+        bottom: 8px;
+        width: 0;
+        height: 0;
+        border-top: 3px solid transparent;
+        border-left: 3px solid transparent;
+        border-right: 3px solid transparent;
+        border-bottom: 3px solid #dfe1e6;
+        border-image: initial;
+      }
+
+      &::before {
+        border-right: 3px solid transparent;
+        border-bottom: 3px solid transparent;
+        border-left: 3px solid transparent;
+        border-image: initial;
+        display: block;
+        height: 0px;
+        right: -8px;
+        width: 0px;
+        position: absolute;
+        border-top: 3px solid #dfe1e6;
+        bottom: 0px;
+        content: "";
+      }
+    }
+  }
+
+  th,
+  td {
+    padding: 4px 8px;
+    border: none;
+    box-sizing: border-box;
+    font-size: 12px;
+    font-weight: 600;
+    position: relative;
+    text-align: left;
+
+    color: #5e6c84;
+  }
+
+  th:hover {
+    background-color: rgba(9, 30, 66, 0.08);
+
+    & > span::after {
+      border-bottom: 3px solid #b3bac5;
+    }
+
+    & > span::before {
+      border-top: 3px solid #b3bac5;
+    }
+  }
+
+  th:nth-child(4):hover,
+  th:nth-child(5):hover {
+    background: none;
+  }
+
+  tr:hover {
+    background: rgb(244, 245, 247);
+  }
+
+  th:first-of-type,
+  td:first-of-type {
+    padding-left: 0;
+  }
+
+  // th:nth-child(4),
+  // td:nth-child(4) {
+  //   padding-right: 0;
+  // }
+
+  th:nth-child(5),
+  td:nth-child(5) {
+    padding-left: 0;
+  }
+
+  th:nth-child(1),
+  td:nth-child(1) {
+    max-width: 40px;
+  }
+
+  th:nth-child(2) {
+    width: 66px;
+  }
+
+  th:nth-child(3) {
+    width: 188px;
+  }
+
+  th:nth-child(4) {
+    width: 20px;
+  }
+
+  th:nth-child(5) {
+    width: 32px;
+  }
+
+  thead {
+    border-bottom: 2px solid #dfe1e6;
+  }
+
+  .fileNameBlock {
+    display: flex;
+    align-items: center;
+
+    .fileNameIcon {
+      padding: 4px;
+      display: inline-flex;
+
+      // span {
+      //   width: 24px;
+      //   height: 24px;
+      // }
+
+      i {
+        font-size: 24px;
+      }
+    }
+
+    .fileNameWrap {
+      width: 100%;
+      .fileNamePart1,
+      .fileNamePart2 {
+        display: inline-block;
+        white-space: nowrap;
+        overflow: hidden;
+        max-width: calc(100% - 3.84em);
+        text-overflow: ellipsis;
+      }
+    }
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: center;
+  }
+}

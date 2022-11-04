@@ -1,0 +1,495 @@
+.modal {
+  overflow: hidden;
+  height: 100%;
+  user-select: none;
+}
+
+.breadcrumbWrap {
+  display: flex;
+  align-items: center;
+
+  .breadcrumbEpic {
+    height: 1.71429em;
+    line-height: 1.71429em;
+  }
+
+  .breadcrumbCheck {
+    background: none !important;
+    width: 24px;
+    height: 24px;
+    margin-left: 5px;
+
+    &:hover {
+      background: rgba(9, 30, 66, 0.08) !important;
+    }
+
+    .breadcrumbCheckIcon {
+      color: #4bade8;
+    }
+  }
+
+  .breadcrumbMark {
+    padding: 0;
+  }
+
+  .separate {
+    margin-left: 5px;
+  }
+}
+
+.css-95a6y4-ModalBody {
+  height: 100%;
+  overflow: hidden;
+}
+
+.dropAreaWrap {
+  position: relative;
+  width: 100%;
+  height: calc(100% - 79px);
+
+  .dropArea {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(237, 244, 255, 0.6);
+    z-index: 90;
+    border: 2px dashed #8abdff;
+  }
+}
+
+.modalBody {
+  padding: 0 24px 0 0;
+  height: 100%;
+}
+
+.modalContent {
+  display: flex;
+  height: 100%;
+
+  .resizable {
+    position: relative;
+    // width: calc(100% - 400px);
+    // max-width: calc(100% - 200px);
+    // min-width: 200px;
+    padding: 0 25px 0 0;
+  }
+  .resizer {
+    /* All resizers are positioned absolutely inside the element */
+    position: absolute;
+  }
+
+  /* Placed at the right side */
+  .resizerR {
+    cursor: col-resize;
+    height: 100%;
+    right: 0;
+    top: 0;
+    width: 26px;
+    // background: #ccc;
+
+    &:hover::before {
+      opacity: 1;
+    }
+
+    &::before {
+      content: "";
+      width: 2px;
+      height: 100%;
+      display: block;
+      margin: 0 auto;
+      background: #2684ff;
+      opacity: 0;
+      transition: 0.3s ease;
+    }
+  }
+
+  // /* Placed at the bottom side */
+  // .resizer-b {
+  //   bottom: 0;
+  //   cursor: row-resize;
+  //   height: 5px;
+  //   left: 0;
+  //   width: 100%;
+  // }
+
+  .leftPart {
+    //// flex: 0 1 calc(60% + 12px);
+    height: 100%;
+    min-width: 380px;
+    max-width: 877px;
+    width: 800px;
+
+    .leftPartContent {
+      // height: calc(100% - 19px);
+      height: 100%;
+      overflow: hidden auto;
+
+      width: 100%;
+
+      .leftPartContentWrap {
+        padding: 0px 24px 32px 32px;
+      }
+    }
+
+    .buttonGroup {
+      position: relative;
+      z-index: 10;
+      margin: 4px 0 10px 0;
+
+      .addLink {
+        border-radius: 3px 0 0 3px;
+      }
+
+      .addLinkMenu {
+        border-radius: 0 3px 3px 0;
+        border-left: 2px solid #dfe1e6;
+      }
+    }
+
+    .progressBarBlock {
+      margin-top: 40px;
+      .progressBarTitleBlock {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        // margin-bottom: 10px;
+        .progressBarTitle {
+          font-size: 14px;
+        }
+
+        .sortNodes {
+          display: flex;
+          align-items: center;
+          gap: 0 7px;
+
+          .selectNode {
+            button[aria-expanded="false"] {
+              background: #fff;
+
+              &:hover {
+                background: rgba(9, 30, 66, 0.08);
+              }
+            }
+          }
+
+          .addNoteBtn {
+            width: 1.71429em;
+            height: 1.71429em;
+          }
+        }
+      }
+
+      .percent {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .progressBarWrap {
+          display: flex;
+          align-items: center;
+          width: 100%;
+          height: 10px;
+          border-radius: 5px;
+          background: #ebecf0;
+          .progressBar {
+            height: 10px;
+            transition: width 0.3s ease;
+            &.complete {
+              border-radius: 5px 0 0 5px;
+              background: #36b37e;
+
+              &.add {
+                border-radius: 5px;
+              }
+            }
+
+            &.inProgress {
+              border-radius: 0 5px 5px 0;
+              background: #0052cc;
+
+              &.add {
+                border-radius: 5px;
+              }
+            }
+
+            &.todo {
+              border-radius: 0 5px 5px 0;
+              background: #ebecf0;
+
+              &.add {
+                border-radius: 5px;
+              }
+            }
+          }
+        }
+      }
+
+      .percentComplete {
+        white-space: nowrap;
+
+        span {
+          margin-left: 12px;
+        }
+      }
+    }
+
+    .listNode {
+      box-shadow: 0 1px 1px rgba(9, 30, 66, 0.25),
+        0 0 1px 1px rgba(9, 30, 66, 0.13);
+      background: #fafbfc;
+      border-radius: 3px;
+      padding: 2px 0px;
+      margin: 8px 1px;
+    }
+  }
+
+  .rightPart {
+    flex-grow: 1;
+    padding-left: 8px;
+    height: calc(100% - 18px);
+    overflow: hidden auto;
+    min-width: 255px;
+  }
+}
+
+.btnsWrap {
+  display: flex;
+  align-items: center;
+  button {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    margin-left: 11px;
+
+    & > span {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  .watchWrap {
+    button {
+      width: 48px;
+    }
+
+    .countWatch {
+      margin-left: 6px;
+    }
+  }
+}
+
+.wrapStyles {
+  font-size: 24px;
+  font-weight: 500;
+  line-height: inherit;
+  margin-left: -8px;
+
+  & form > div {
+    margin: 0;
+  }
+
+  .taskTitle {
+    padding: 6px;
+  }
+
+  .editTextAreaTask {
+    padding: 6px !important;
+    margin: 0 !important;
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 24px !important;
+    // height: 40px !important;
+    min-height: 40px !important;
+    max-height: 1000px !important;
+
+    // & > [data-ds--text-field--input] {
+    //   font-size: inherit;
+    //   font-weight: inherit;
+    //   line-height: inherit;
+    // }
+  }
+}
+
+.node {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.3s ease;
+  background: #ffffff;
+  border-radius: 3px;
+  cursor: pointer;
+  position: relative;
+  height: 40px;
+  // padding: 0px 6px;
+  margin: 0px 2px;
+  // padding: 0 6px;
+  border-bottom: 1px solid #ebecf0;
+
+  .css-wxvfrp:not([data-compact]) {
+    height: 30px;
+  }
+
+  &:hover {
+    background: #ebecf0;
+  }
+
+  &:hover .editFieldNode {
+    display: block;
+  }
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  .nodeContent {
+    padding-left: 6px;
+  }
+
+  .react-select__indicators {
+    width: 20px;
+    height: 20px;
+  }
+
+  .single-select.complete .react-select__control {
+    background-color: #e3fcef !important;
+
+    &:hover {
+      background-color: #00875a !important;
+
+      .react-select__single-value,
+      svg {
+        color: #fff !important;
+      }
+    }
+  }
+
+  .single-select.todo .react-select__single-value,
+  .single-select.todo svg {
+    color: #42526e !important;
+  }
+
+  .single-select.todo .react-select__control {
+    background-color: #dfe1e6 !important;
+
+    &:hover {
+      background-color: #a5adba !important;
+
+      .react-select__single-value,
+      svg {
+        color: #172b4d !important;
+      }
+    }
+  }
+
+  .single-select.complete .react-select__single-value,
+  .single-select.complete svg {
+    color: #006644 !important;
+  }
+
+  .single-select .react-select__control {
+    min-height: 20px;
+    padding-right: 5px;
+
+    border-radius: 3px;
+    max-width: 100%;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    vertical-align: baseline;
+
+    background-color: #deebff !important;
+
+    &:hover {
+      background-color: #0052cc !important;
+
+      .react-select__single-value,
+      svg {
+        color: #fff !important;
+      }
+    }
+  }
+
+  .single-select:focus {
+    outline: 1px solid red;
+  }
+
+  .single-select .react-select__single-value,
+  .single-select svg {
+    color: #0747a6 !important;
+  }
+
+  .react-select__menu {
+    right: 0;
+    // position: fixed;
+    // inset: 0px auto auto 0px;
+    // transform: translate(668px, 411px);
+  }
+
+  .rightEditNode {
+    display: flex;
+    align-items: center;
+
+    .removeNode {
+      margin-right: 6px;
+    }
+  }
+}
+
+.css-1xajwue-ReadView {
+  width: 100% !important;
+}
+
+.single-select.add {
+  margin: 0 6px;
+}
+
+.editNode {
+  display: flex;
+  align-items: center;
+  width: 0%;
+  flex: 1;
+
+  span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  form,
+  form > div {
+    margin: 0;
+  }
+
+  .editFieldNode {
+    display: none;
+    width: 100% !important;
+    margin-left: 5px;
+
+    button {
+      width: 1.71429em;
+      height: 1.71429em;
+    }
+  }
+}
+
+.activeEdit {
+  form {
+    width: 100%;
+  }
+}
+
+.formFooter footer {
+  margin-top: 10px;
+}
+
+input[type="file"] {
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  z-index: -10;
+}
