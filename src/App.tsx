@@ -32,7 +32,7 @@ import {
 } from "@atlaskit/page-layout";
 import { SlotLabel, SlotWrapper } from "./page-layout/common";
 import ToDoList from "./components/ToDoList/ToDoList";
-import TopNavigationContents from "./components/topNavigationContents/topNavigationContents";
+// import TopNavigationContents from "./components/topNavigationContents/topNavigationContents";
 import PageHeaderComplex from "./components/pageHeader/pageHeader";
 
 import Tooltip from "@atlaskit/tooltip";
@@ -42,15 +42,7 @@ import FileList from "./components/modal/taskInfo/components/fileList/fileList";
 import UserService from "./services/UserService";
 
 export default function App() {
-  // if (UserService.isLoggedIn()) {
-  //   console.log("g");
-  // } else {
-  //   UserService.doLogin();
-  // }
   return (
-    // <div>
-    //   <FileList></FileList>
-    // </div>
     <PageLayout>
       <TopNavigation
         isFixed={true}
@@ -127,23 +119,23 @@ const ExpandKeyboardShortcut = () => {
   return null;
 };
 
-// function TopNavigationContents() {
-//   return (
-//     <AtlassianNavigation
-//       label="site"
-//       moreLabel="More"
-//       primaryItems={[
-//         <PrimaryButton isHighlighted>Item 1</PrimaryButton>,
-//         <PrimaryButton>Item 2</PrimaryButton>,
-//         <PrimaryButton>Item 3</PrimaryButton>,
-//         <PrimaryButton>Item 4</PrimaryButton>,
-//       ]}
-//       renderProductHome={ProductHomeExample}
-//       renderCreate={DefaultCreate}
-//       renderHelp={HelpPopup}
-//     />
-//   );
-// }
+function TopNavigationContents() {
+  return (
+    <AtlassianNavigation
+      label="site"
+      moreLabel="More"
+      primaryItems={[
+        <PrimaryButton isHighlighted>Item 1</PrimaryButton>,
+        <PrimaryButton>Item 2</PrimaryButton>,
+        <PrimaryButton>Item 3</PrimaryButton>,
+        <PrimaryButton>Item 4</PrimaryButton>,
+      ]}
+      renderProductHome={ProductHomeExample}
+      renderCreate={DefaultCreate}
+      renderHelp={HelpPopup}
+    />
+  );
+}
 
 const SideNavigationContent = () => {
   return (

@@ -18,14 +18,12 @@ const AddNote = memo((props: any) => {
   const task = tasks[props.task.task.id];
 
   const addNote: any = (data: any, form: any) => {
-    console.log(1111111);
-
     const nodes: any = [
       ...task.nodes,
       {
         id: Date.now(),
         content: data.content,
-        columnId: "column-1",
+        stage: "to-do",
         date: Date.now().toString(),
       },
     ];

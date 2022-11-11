@@ -134,6 +134,8 @@ const InfoTaskAccord = memo((props: any) => {
     setChangeMask(!changeMask);
   };
 
+  console.log("columns", columns);
+
   const columnsName = Object.values(columns)
     .map((el: any) => {
       return { label: el.title, value: el.id };
@@ -158,20 +160,18 @@ const InfoTaskAccord = memo((props: any) => {
     }
   };
 
-  const changeColumnHandler = useCallback(
-    (columnId: any) => {
-      dispatch(
-        transitionTask({
-          fromColumnId,
-          toColumnId: columnId.value,
-          taskId: props.taskInfo.task.id,
-        })
-      );
+  // перемещение таксков в другую колонку
+  const changeColumnHandler = (columnId: any) => {
+    dispatch(
+      transitionTask({
+        fromColumnId,
+        toColumnId: columnId.value,
+        taskId: props.taskInfo.task.id,
+      })
+    );
 
-      dispatch(setFromColumnId(columnId.value));
-    },
-    [transitionTask, setFromColumnId]
-  );
+    dispatch(setFromColumnId(columnId.value));
+  };
 
   // const toogleDateFormatHandler = useCallback(() => {
   //   setToogleDateFormat(!toogleDateFormat);
@@ -187,9 +187,9 @@ const InfoTaskAccord = memo((props: any) => {
         <Select
           inputId="single-select-example"
           className={`single-select ${
-            fromColumnId === "column-1"
+            columns[fromColumnId].stage === "to-do"
               ? "todo"
-              : fromColumnId === "column-3"
+              : columns[fromColumnId].stage === "done"
               ? "done"
               : ""
           }`}
@@ -202,7 +202,6 @@ const InfoTaskAccord = memo((props: any) => {
           onChange={changeColumnHandler}
           // defaultMenuIsOpen={true}
         />
-
         {props.taskInfo.task.flag && (
           <div className="noted">
             <span className="icon">
@@ -243,7 +242,7 @@ const InfoTaskAccord = memo((props: any) => {
           ) : task.marks.length ? (
             <div onClick={changeMaskHandler} className="value">
               <div className="markList">
-                {task.marks.map((mark: any) => (
+                {JSON.parse(task.marks).map((mark: any) => (
                   <a href="#" className="mark" key={mark.value}>
                     {mark.label}
                   </a>

@@ -1,4 +1,5 @@
-import React, { Fragment, memo, useState } from "react";
+import React, { Fragment, memo, useCallback, useMemo, useState } from "react";
+import { useQuery } from "@apollo/client";
 import styled from "styled-components";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import Column from "../column/column";
@@ -14,6 +15,8 @@ import ModalRemoveColumn from "../modal/removeColumn/removeColumn";
 import TaskInfo from "../modal/taskInfo/taskInfo";
 import ModalLimitTasks from "../modal/limitTasks/limitTasks";
 import ModalMarks from "../modal/marks/marks";
+import { GET_COLUMNS } from "../../apollo/Queries";
+import arrayToObject from "../../utils/arrayToObject";
 
 // class InnerList extends React.PureComponent {
 //   render() {
@@ -27,18 +30,24 @@ const InnerList = memo((props: any) => {
   const { searchValue } = useSelector((state: any) => state.toDoReducer);
   const { column, taskMap, index }: any = props;
 
+  // const searchTasks = useMemo(() => {
+  //   return () => {
+  //     console.log("searchTasks");
+  //     return Object.values(taskMap).filter((task: any) =>
+  //       task.content.toLowerCase().includes(searchValue.toLowerCase())
+  //     );
+  //   };
+  // }, [searchValue]);
+
   const taskArr = Object.values(taskMap).filter((task: any) =>
     task.content.toLowerCase().includes(searchValue.toLowerCase())
   );
 
-  const taskMapTransform: any = taskArr.reduce(
-    (result: any, item: any, index: any) => {
-      let key: any = Object.values(item)[0];
-      result[key] = { ...item };
-      return result;
-    },
-    {}
-  );
+  console.log("taskArr", taskArr);
+
+  const taskMapTransform = arrayToObject(taskArr);
+
+  console.log("taskMapTransform", taskMapTransform);
 
   // const tasks = column.taskIds.map((taskId) => taskMap[taskId]);
   const tasks = column.taskIds.map((taskId: any) => {
@@ -54,14 +63,40 @@ const InnerList = memo((props: any) => {
 
 const ToDoList = () => {
   const list: any = useSelector((state: any) => state.toDoReducer);
-  const { updateTodoList } = toDoSlice.actions;
+  const { initialTaskList, updateTodoList } = toDoSlice.actions;
   const { setAddTaskBtnFlag } = flagSlice.actions;
   const dispatch = useDispatch();
+
+  const { loading, error, data } = useQuery(GET_COLUMNS, {
+    onCompleted: (data) => {
+      let { tasks, columns, columnOrder } = data.TM_getColumns.body;
+      console.log("data", data);
+
+      tasks = tasks.map((task: any) => {
+        return {
+          ...task,
+          links: JSON.parse(task.links),
+          marks: JSON.parse(task.marks),
+          nodes: JSON.parse(task.nodes),
+        };
+      });
+
+      const tasksObj = arrayToObject(tasks);
+
+      const columnsObj = arrayToObject(columns);
+
+      dispatch(initialTaskList({ tasksObj, columnsObj, columnOrder }));
+    },
+  });
+
+  console.log("list", list);
 
   let col = null;
   let title: any = null;
 
   const onDragEnd = (result: any) => {
+    console.log("result", result);
+
     dispatch(setAddTaskBtnFlag(true));
     dispatch(updateTodoList(result));
     if (title) {
@@ -88,16 +123,6 @@ const ToDoList = () => {
 
   const onBeforeDragStart = (result: any) => {
     dispatch(setAddTaskBtnFlag(false));
-    // setTimeout(() => {
-    //   col = document.querySelector(
-    //     `div[data-rbd-draggable-id='${result.draggableId}']`
-    //   );
-    //   title = col.querySelector(".titleWrap");
-    //   if (title) {
-    //     col.style.top = "223px";
-    //     title.style.position = "relative";
-    //   }
-    // });
   };
 
   const handleScroll = (event: any) => {

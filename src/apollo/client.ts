@@ -8,8 +8,8 @@ import { setContext } from "@apollo/client/link/context";
 import UserService from "../services/UserService";
 
 const link = createHttpLink({
-  // uri: "http://10.1.1.200:1678/monitor/graphql",
-  uri: "http://api.lendo.uz/monitor/graphql",
+  uri: "http://10.1.1.177:1701/graphql",
+  // uri: process.env.GQ_URL,
   credentials: "same-origin",
 });
 
@@ -20,7 +20,7 @@ const authLink = setContext((_, { headers }) => {
   return {
     headers: {
       ...headers,
-      authorization: UserService.getToken()
+      Authorization: UserService.getToken()
         ? `Bearer ${UserService.getToken()}`
         : "",
     },
@@ -40,6 +40,7 @@ const defaultOptions = {
 
 const client = new ApolloClient({
   link: authLink.concat(link),
+  // cache: new InMemoryCache(),
   cache: new InMemoryCache({
     addTypename: false,
   }),

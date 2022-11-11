@@ -24,8 +24,14 @@ import Form, {
 import { toDoSlice } from "../../../store/reducers/ToDoSlice";
 
 import styles from "./limitTasks.module.scss";
+import { useMutation } from "@apollo/client";
+import { ADD_COLUMN } from "../../../apollo/Mutation";
+import { GET_COLUMNS } from "../../../apollo/Queries";
 
 export default function ModalLimitTasks() {
+  const [updateColumn, { loading, error, data }] = useMutation(ADD_COLUMN, {
+    refetchQueries: [GET_COLUMNS],
+  });
   const { limitTasks } = useSelector((state: any) => state.flagReducer);
   const dispatch = useDispatch();
   const { modalLimitTasks } = flagSlice.actions;
@@ -40,6 +46,31 @@ export default function ModalLimitTasks() {
       ),
     []
   );
+
+  const submitHandler = (data: any) => {
+    console.log("data", data);
+
+    updateColumn({
+      variables: {
+        columns: [
+          {
+            id: limitTasks.column.id,
+            taskLimit: data.limitTask ? Number(data.limitTask) : null,
+          },
+        ],
+      },
+    });
+    // dispatch(
+    //   addLimitTasks({
+    //     columnId: limitTasks.column.id,
+    //     limit: Number(data.limitTask),
+    //   })
+    // );
+    if (!error) {
+      closeModal();
+    }
+  };
+
   const focusRef = useRef();
 
   const validate = (value: any) => {
@@ -53,17 +84,7 @@ export default function ModalLimitTasks() {
     <ModalTransition>
       {limitTasks.isOpen && (
         <Modal autoFocus={focusRef} onClose={closeModal} width="small">
-          <Form
-            onSubmit={(data: any) => {
-              dispatch(
-                addLimitTasks({
-                  columnId: limitTasks.column.id,
-                  limit: Number(data.limitTask),
-                })
-              );
-              closeModal();
-            }}
-          >
+          <Form onSubmit={submitHandler}>
             {({ formProps, submitting, reset }) => (
               <form {...formProps}>
                 <ModalHeader>
@@ -114,8 +135,10 @@ export default function ModalLimitTasks() {
                               <ValidMessage>Awesome password!</ValidMessage>
                             ) : null} */}
                               </div>
-
-                              {fieldProps.value && (
+                              {/* <pre>
+                                {JSON.stringify(fieldProps.value, null, 2)}
+                              </pre> */}
+                              {(fieldProps.value || fieldProps.value === 0) && (
                                 <Button
                                   className={styles.resetLimit}
                                   appearance="subtle"

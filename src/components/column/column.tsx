@@ -24,6 +24,9 @@ import { useDispatch } from "react-redux";
 import { toDoSlice } from "../../store/reducers/ToDoSlice";
 import { flagSlice } from "../../store/reducers/FlagSlice";
 import declensionOfWords from "../../pipes/declensionOfWords";
+import { useMutation } from "@apollo/client";
+import { ADD_COLUMN } from "../../apollo/Mutation";
+import { GET_COLUMNS } from "../../apollo/Queries";
 
 const Title = styled.h2`
   width: 193px;
@@ -65,7 +68,10 @@ const ColumnTodo: any = styled.div`
 // }
 
 const EditTitleColumn = (props: any) => {
-  // const [editValue, setEditValue] = useState(props.children);
+  const [addColumn, { loading, error, data }] = useMutation(ADD_COLUMN, {
+    refetchQueries: [{ query: GET_COLUMNS }],
+  });
+
   const dispatch = useDispatch();
   const { addTitleColumn } = toDoSlice?.actions;
   useEffect(() => {
@@ -73,9 +79,9 @@ const EditTitleColumn = (props: any) => {
   }, []);
 
   return (
-    <div className="textAreaWrap add titleColumn">
+    <div className="textAreaWrap add">
       <InlineEdit
-        // className="titleColumn"
+        className="titleColumn"
         defaultValue={props.children}
         editView={({ errorMessage, ...fieldProps }) => (
           <Textfield {...fieldProps} autoFocus />
@@ -113,10 +119,17 @@ const EditTitleColumn = (props: any) => {
           </h2>
         )}
         onConfirm={(value) => {
-          dispatch(
-            addTitleColumn({ columnId: props?.column?.id, title: value })
-          );
-          // setEditValue(value);
+          if (value.trim().length) {
+            addColumn({
+              variables: {
+                columns: [{ taskLimit: 2, title: value }],
+              },
+            });
+          } else {
+            dispatch(
+              addTitleColumn({ columnId: props?.column?.id, title: value })
+            );
+          }
 
           setTimeout(() => {
             props.setFalg(true);
@@ -178,16 +191,14 @@ const DropdownMenuTitle = (props: any) => {
         />
       )}
     >
-      <div className="taskMenu">
-        <DropdownItemGroup>
-          <Section>
-            <DropdownItem onClick={openModalLimitTasks}>
-              Задать лимит количества столбцов
-            </DropdownItem>
-            <DropdownItem onClick={openModalDeleteColumn}>Удалить</DropdownItem>
-          </Section>
-        </DropdownItemGroup>
-      </div>
+      <DropdownItemGroup className="taskMenu">
+        <Section>
+          <DropdownItem onClick={openModalLimitTasks}>
+            Задать лимит количества столбцов
+          </DropdownItem>
+          <DropdownItem onClick={openModalDeleteColumn}>Удалить</DropdownItem>
+        </Section>
+      </DropdownItemGroup>
     </DropdownMenu>
   );
 };
