@@ -1,5 +1,12 @@
-import React, { Fragment, memo, useCallback, useMemo, useState } from "react";
-import { useQuery } from "@apollo/client";
+import React, {
+  Fragment,
+  memo,
+  useCallback,
+  useMemo,
+  useState,
+  useEffect,
+} from "react";
+import { useMutation, useQuery } from "@apollo/client";
 import styled from "styled-components";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import Column from "../column/column";
@@ -16,38 +23,24 @@ import TaskInfo from "../modal/taskInfo/taskInfo";
 import ModalLimitTasks from "../modal/limitTasks/limitTasks";
 import ModalMarks from "../modal/marks/marks";
 import { GET_COLUMNS } from "../../apollo/Queries";
-import arrayToObject from "../../utils/arrayToObject";
-
-// class InnerList extends React.PureComponent {
-//   render() {
-//     const { column, taskMap, index } = this.props;
-//     const tasks = column.taskIds.map((taskId) => taskMap[taskId]);
-//     return <Column column={column} tasks={tasks} index={index} />;
-//   }
-// }
+import { arrayToObject, transformData } from "../../utils/transformData";
+import {
+  ADD_TASK,
+  SET_COLUMN_ORDER,
+  SET_TASK_ORDER,
+} from "../../apollo/Mutation";
+import { useGetColumnsQuery } from "../../hooks/useGetColumnsQuery";
+import { updateStore } from "../../utils/updateStore";
 
 const InnerList = memo((props: any) => {
   const { searchValue } = useSelector((state: any) => state.toDoReducer);
   const { column, taskMap, index }: any = props;
 
-  // const searchTasks = useMemo(() => {
-  //   return () => {
-  //     console.log("searchTasks");
-  //     return Object.values(taskMap).filter((task: any) =>
-  //       task.content.toLowerCase().includes(searchValue.toLowerCase())
-  //     );
-  //   };
-  // }, [searchValue]);
-
   const taskArr = Object.values(taskMap).filter((task: any) =>
     task.content.toLowerCase().includes(searchValue.toLowerCase())
   );
 
-  console.log("taskArr", taskArr);
-
   const taskMapTransform = arrayToObject(taskArr);
-
-  console.log("taskMapTransform", taskMapTransform);
 
   // const tasks = column.taskIds.map((taskId) => taskMap[taskId]);
   const tasks = column.taskIds.map((taskId: any) => {
@@ -62,50 +55,191 @@ const InnerList = memo((props: any) => {
 });
 
 const ToDoList = () => {
-  const list: any = useSelector((state: any) => state.toDoReducer);
-  const { initialTaskList, updateTodoList } = toDoSlice.actions;
+  const state: any = useSelector((state: any) => state.toDoReducer);
+  // const [state, setState]: any = useState({
+  //   tasks: {},
+  //   columns: {},
+  //   columnOrder: [],
+  // });
+  const { initialTaskList /*updateTodoList*/ } = toDoSlice.actions;
   const { setAddTaskBtnFlag } = flagSlice.actions;
   const dispatch = useDispatch();
 
   const { loading, error, data } = useQuery(GET_COLUMNS, {
     onCompleted: (data) => {
-      let { tasks, columns, columnOrder } = data.TM_getColumns.body;
-      console.log("data", data);
+      //redux thunk
+      dispatch(updateStore(data.TM_getColumns.body));
 
-      tasks = tasks.map((task: any) => {
-        return {
-          ...task,
-          links: JSON.parse(task.links),
-          marks: JSON.parse(task.marks),
-          nodes: JSON.parse(task.nodes),
-        };
-      });
-
-      const tasksObj = arrayToObject(tasks);
-
-      const columnsObj = arrayToObject(columns);
-
-      dispatch(initialTaskList({ tasksObj, columnsObj, columnOrder }));
+      // setState({
+      //   tasks,
+      //   columns: columnsObj,
+      //   columnOrder,
+      // });
     },
   });
 
-  console.log("list", list);
+  const [setTaskOrder, { errorTaskOrder }] = useMutation(SET_TASK_ORDER, {
+    // onCompleted: (data) => {
+    //   dispatch(updateStore(data.TM_setTaskOrder.body));
+    // },
+    // refetchQueries: [{ query: GET_COLUMNS }],
+  });
+
+  const [setColumnOrder, {}] = useMutation(SET_COLUMN_ORDER, {
+    // refetchQueries: [{ query: GET_COLUMNS }],
+  });
+
+  const [addTaskQuery, {}] = useMutation(ADD_TASK, {
+    // refetchQueries: [{ query: GET_COLUMNS }],
+  });
 
   let col = null;
   let title: any = null;
 
   const onDragEnd = (result: any) => {
-    console.log("result", result);
+    /*********** drag & drop logic*************/
+    const { destination, source, draggableId, type } = result;
 
-    dispatch(setAddTaskBtnFlag(true));
-    dispatch(updateTodoList(result));
+    if (!destination) {
+      return;
+    }
+
+    if (
+      destination.droppableId === source.droppableId &&
+      destination.index === source.index
+    ) {
+      return;
+    }
+
+    if (type === "column") {
+      const newColumnOrder = Array.from(state.columnOrder);
+      newColumnOrder.splice(source.index, 1);
+      newColumnOrder.splice(destination.index, 0, draggableId);
+
+      const newState = {
+        ...state,
+        columnOrder: newColumnOrder,
+      };
+
+      // setState(newState);
+      dispatch(
+        initialTaskList({
+          tasks: newState.tasks,
+          columns: newState.columns,
+          columnOrder: newState.columnOrder,
+        })
+      );
+
+      setColumnOrder({
+        variables: {
+          columnIds: newColumnOrder,
+        },
+      });
+
+      return;
+    }
+
+    const home = state.columns[source.droppableId];
+    const foreign = state.columns[destination.droppableId];
+
+    if (home === foreign) {
+      const newTaskIds = Array.from(home.taskIds);
+      newTaskIds.splice(source.index, 1);
+      newTaskIds.splice(destination.index, 0, draggableId);
+
+      const newHome = {
+        ...home,
+        taskIds: newTaskIds,
+      };
+
+      const newState = {
+        ...state,
+        columns: {
+          ...state.columns,
+          [newHome.id]: newHome,
+        },
+      };
+
+      // setState(newState);
+
+      dispatch(
+        initialTaskList({
+          tasks: newState.tasks,
+          columns: newState.columns,
+          columnOrder: newState.columnOrder,
+        })
+      );
+
+      setTaskOrder({
+        variables: {
+          taskIds: newTaskIds,
+        },
+      });
+
+      return;
+    }
+
+    // moving from one list to another
+    const homeTaskIds = Array.from(home.taskIds);
+    homeTaskIds.splice(source.index, 1);
+    const newHome = {
+      ...home,
+      taskIds: homeTaskIds,
+    };
+
+    const foreingTaskIds = Array.from(foreign.taskIds);
+    foreingTaskIds.splice(destination.index, 0, draggableId);
+    const newForeign = {
+      ...foreign,
+      taskIds: foreingTaskIds,
+    };
+
+    const newState = {
+      ...state,
+      columns: {
+        ...state.columns,
+        [newHome.id]: newHome,
+        [newForeign.id]: newForeign,
+      },
+    };
+
+    // setState(newState);
+    dispatch(
+      initialTaskList({
+        tasks: newState.tasks,
+        columns: newState.columns,
+        columnOrder: newState.columnOrder,
+      })
+    );
+
+    const { id, content, files, flag, links, marks, nodes } =
+      state.tasks[draggableId];
+
+    addTaskQuery({
+      variables: {
+        tasks: {
+          id,
+          content,
+          files,
+          flag,
+          links: JSON.stringify(links),
+          marks: JSON.stringify(marks),
+          nodes: JSON.stringify(nodes),
+          columnId: destination.droppableId,
+          order: destination.index,
+        },
+      },
+    }),
+      /************************/
+      dispatch(setAddTaskBtnFlag(true));
+
     if (title) {
       title.style.position = "sticky";
     }
 
     if (
-      result.destination.droppableId === "column-3" &&
-      result.source.droppableId !== "column-3"
+      result.destination.droppableId === "col_19" &&
+      result.source.droppableId !== "col_19"
     ) {
       setTimeout(() => {
         const task: any = document.querySelector(
@@ -196,14 +330,14 @@ const ToDoList = () => {
             >
               <div id="leftMargin" className={styles.leftMargin}></div>
 
-              {list.columnOrder.map((columnId: any, index: any) => {
-                const column: any = list.columns[columnId];
+              {state.columnOrder.map((columnId: any, index: any) => {
+                const column: any = state.columns[columnId];
 
                 return (
                   <InnerList
                     key={column.id}
                     column={column}
-                    taskMap={list.tasks}
+                    taskMap={state.tasks}
                     index={index}
                   />
                 );

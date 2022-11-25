@@ -7,6 +7,10 @@ import NewFeature24Icon from "@atlaskit/icon-object/glyph/new-feature/24";
 import styles from "./addBetweenTasks.module.scss";
 import { toDoSlice } from "../../store/reducers/ToDoSlice";
 import { useDispatch } from "react-redux";
+import { useMutation } from "@apollo/client";
+import { ADD_TASK } from "../../apollo/Mutation";
+import { GET_COLUMNS } from "../../apollo/Queries";
+import { updateStore } from "../../utils/updateStore";
 
 const AddBetweenTasksBtn = () => {
   return (
@@ -19,13 +23,19 @@ const AddBetweenTasksBtn = () => {
 };
 
 const AddBetweenTasks = memo((props: any) => {
+  const [addTaskQuery, { loading, error, data }] = useMutation(ADD_TASK, {
+    onCompleted: (data) => {
+      dispatch(updateStore(data.TM_addTask.body));
+    },
+    // refetchQueries: [{ query: GET_COLUMNS }],
+  });
+
   const [editValue, setEditValue] = useState("");
   const { addTask } = toDoSlice.actions;
   const dispatch = useDispatch();
 
   const addTaskValue = (value: any) => {
     if (value) {
-      setEditValue(value);
       dispatch(
         addTask({
           value,
@@ -33,6 +43,22 @@ const AddBetweenTasks = memo((props: any) => {
           position: props.taskIndex,
         })
       );
+
+      addTaskQuery({
+        variables: {
+          tasks: {
+            // id: `task_${Date.now().toString()}`,
+            columnId: props.column.id,
+            content: value,
+            files: "[]",
+            flag: false,
+            links: "[]",
+            marks: "[]",
+            nodes: "[]",
+            order: props.taskIndex,
+          },
+        },
+      });
     }
   };
 

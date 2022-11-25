@@ -21,104 +21,13 @@ import { useDispatch } from "react-redux";
 import { flagSlice } from "../../store/reducers/FlagSlice";
 import { toDoSlice } from "../../store/reducers/ToDoSlice";
 import { useState } from "react";
+import DropdownMenuTask from "./components/dropdownMenuTask/DropdownMenuTask";
+import MenuGroupComponent from "./components/menuGroupComponent/MenuGroupComponent";
 
 const Container = styled.div`
   // background-color: ${(props: any) =>
     props.isDragging ? "lightgreen" : "white"};
 `;
-
-const MenuGroupComponent = (props: any) => {
-  const dispatch = useDispatch();
-  const { setTaskData, setModalTaskData } = flagSlice.actions;
-  const { editTask } = toDoSlice.actions;
-
-  const setTaskDataHandler = () => {
-    console.log("props", props);
-    dispatch(
-      setTaskData({
-        modal: true,
-        taskId: props.task.id,
-        columnId: props.column.id,
-      })
-    );
-  };
-
-  const modalMarkHandler = () => {
-    dispatch(
-      setModalTaskData({
-        isOpen: true,
-        task: props.task,
-      })
-    );
-  };
-
-  const toggleFlagTaskHandler = (value: any) => {
-    dispatch(
-      editTask({
-        taskId: props.task.id,
-        data: value,
-        dataName: "flag",
-      })
-    );
-  };
-  return (
-    <MenuGroup>
-      <Section title="Действия">
-        {props.task.flag ? (
-          <DropdownItem onClick={() => toggleFlagTaskHandler(false)}>
-            Снять отметку
-          </DropdownItem>
-        ) : (
-          <DropdownItem onClick={() => toggleFlagTaskHandler(true)}>
-            Добавить флажок
-          </DropdownItem>
-        )}
-
-        <DropdownItem onClick={modalMarkHandler}>Добавить метку</DropdownItem>
-        <DropdownItem>Добавить родительскую задачу</DropdownItem>
-        <DropdownItem>Копировать ссылку на задачу</DropdownItem>
-        <DropdownItem onClick={setTaskDataHandler}>Удалить</DropdownItem>
-      </Section>
-      <Section title="Переместить в">
-        <ButtonItem>Нижняя часть столбца</ButtonItem>
-      </Section>
-    </MenuGroup>
-  );
-};
-
-const DropdownMenuTask = (props: any) => {
-  // const removeFlagTaskHandler = () => {
-  //   dispatch(
-  //     editTask({
-  //       taskId: props.task.id,
-  //       data: false,
-  //       dataName: "flag",
-  //     })
-  //   );
-  // };
-
-  return (
-    <DropdownMenu
-      placement="bottom-end"
-      trigger={({ triggerRef, ...props }) => (
-        <Button
-          {...props}
-          iconBefore={<MoreIcon label="more" />}
-          ref={triggerRef}
-        />
-      )}
-    >
-      <div className="taskMenu">
-        <DropdownItemGroup>
-          <MenuGroupComponent
-            column={props.column}
-            task={props.task}
-          ></MenuGroupComponent>
-        </DropdownItemGroup>
-      </div>
-    </DropdownMenu>
-  );
-};
 
 const Task = (props: any) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -149,7 +58,8 @@ const Task = (props: any) => {
     setCoord({ x: e.clientX + 40, y: e.clientY - 20 });
 
     setTimeout(() => {
-      const menuList: any = document.querySelectorAll(".css-10ki349");
+      const menuList: any = document.querySelectorAll(".taskMenu");
+
       menuList[menuList.length - 1].style.display = "none";
     }, 100);
   };
@@ -248,12 +158,7 @@ const Task = (props: any) => {
               style={{ left: coord.x + "px", top: coord.y + "px" }}
             >
               <DropdownMenu
-                // isOpen={isOpen}
                 defaultOpen={isOpen}
-                // onOpenChange={(attrs) => {
-                //   setIsOpen(attrs.isOpen);
-                // }}
-                // placement="bottom-end"
                 trigger={({ triggerRef, ...props }) => (
                   <Button
                     style={{ opacity: 0, width: 0, height: 0 }}

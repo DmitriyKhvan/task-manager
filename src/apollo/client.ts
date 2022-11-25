@@ -8,7 +8,7 @@ import { setContext } from "@apollo/client/link/context";
 import UserService from "../services/UserService";
 
 const link = createHttpLink({
-  uri: "http://10.1.1.177:1701/graphql",
+  uri: "http://10.1.1.177:1700/graphql",
   // uri: process.env.GQ_URL,
   credentials: "same-origin",
 });

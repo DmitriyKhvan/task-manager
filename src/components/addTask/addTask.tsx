@@ -8,6 +8,10 @@ import "./addTask.scss";
 import { useDispatch } from "react-redux";
 import { toDoSlice } from "../../store/reducers/ToDoSlice";
 import { useSelector } from "react-redux";
+import { useMutation } from "@apollo/client";
+import { ADD_TASK } from "../../apollo/Mutation";
+import { GET_COLUMNS } from "../../apollo/Queries";
+import { updateStore } from "../../utils/updateStore";
 
 const AddTaskBtn = (props: any) => {
   const isActive = true;
@@ -23,13 +27,18 @@ const AddTaskBtn = (props: any) => {
 };
 
 const AddTask = (props: any) => {
+  const [addTaskQuery, { loading, error, data }] = useMutation(ADD_TASK, {
+    onCompleted: (data) => {
+      dispatch(updateStore(data.TM_addTask.body));
+    },
+    // refetchQueries: [{ query: GET_COLUMNS }],
+  });
   const [editValue, setEditValue] = useState("");
   const { addTask } = toDoSlice.actions;
   const dispatch = useDispatch();
 
   const addTaskValue = (value: any) => {
     if (value) {
-      setEditValue(value);
       dispatch(
         addTask({
           value,
@@ -37,7 +46,22 @@ const AddTask = (props: any) => {
           position: props.column.taskIds.length,
         })
       );
-      setEditValue("");
+
+      addTaskQuery({
+        variables: {
+          tasks: {
+            // id: `task_${Date.now().toString()}`,
+            columnId: props.column.id,
+            content: value,
+            files: "[]",
+            flag: false,
+            links: "[]",
+            marks: "[]",
+            nodes: "[]",
+            order: props.column.taskIds.length,
+          },
+        },
+      });
     }
   };
 

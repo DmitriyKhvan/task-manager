@@ -8,94 +8,129 @@ import ButtonGroup from "@atlaskit/button/button-group";
 import LoadingButton from "@atlaskit/button/loading-button";
 import Button from "@atlaskit/button/standard-button";
 import TextField from "@atlaskit/textfield";
+import { useMutation } from "@apollo/client";
+import { ADD_TASK } from "../../../../../apollo/Mutation";
+import { updateStore } from "../../../../../utils/updateStore";
 
-const AddNote = memo((props: any) => {
-  const [disable, setDisable] = useState(true);
-  const dispatch = useDispatch();
-  const { editTask } = toDoSlice.actions;
-  const { tasks, columns } = useSelector((state: any) => state.toDoReducer);
-
-  const task = tasks[props.task.task.id];
-
-  const addNote: any = (data: any, form: any) => {
-    const nodes: any = [
-      ...task.nodes,
-      {
-        id: Date.now(),
-        content: data.content,
-        stage: "to-do",
-        date: Date.now().toString(),
+const AddNote = memo(
+  ({ task: { column, isOpen, task }, setVisibleField }: any) => {
+    const [addTaskQuery, { loading, error, data }] = useMutation(ADD_TASK, {
+      onCompleted: (data) => {
+        dispatch(updateStore(data.TM_addTask.body));
       },
-    ];
+      // refetchQueries: [{ query: GET_COLUMNS }],
+    });
 
-    dispatch(
-      editTask({
-        taskId: props.task.task.id,
-        data: nodes,
-        dataName: "nodes",
-      })
+    const [disable, setDisable] = useState(true);
+    const dispatch = useDispatch();
+    const { editTask } = toDoSlice.actions;
+    const { tasks, columns } = useSelector((state: any) => state.toDoReducer);
+
+    const taskFind = tasks[task.id];
+
+    const orderTask = column?.taskIds.findIndex(
+      (taskId: any) => taskId === task.id
     );
 
-    form.reset({ content: "" });
-    setDisable(true);
-  };
+    const addNote: any = (data: any, form: any) => {
+      const nodes: any = [
+        ...taskFind.nodes,
+        {
+          id: Date.now(),
+          content: data.content,
+          stage: "to-do",
+          date: Date.now().toString(),
+        },
+      ];
 
-  const changeNodeHandler = useCallback((event: any) => {
-    if (event.target.value) {
-      setDisable(false);
-    } else {
-      setDisable(true);
-    }
-  }, []);
+      addTaskQuery({
+        variables: {
+          tasks: {
+            id: task.id,
+            content: task.content,
+            files: task.files,
+            flag: task.flag,
+            links: JSON.stringify(task.links),
+            // marks: JSON.stringify(marks.value),
+            marks: JSON.stringify(task.marks),
+            nodes: JSON.stringify(nodes),
+            columnId: column.id,
+            order: orderTask,
+          },
+        },
+      });
 
-  const cancelAddNode = () => {
-    props.setVisibleField(false);
-  };
+      // dispatch(
+      //   editTask({
+      //     taskId: task.id,
+      //     data: nodes,
+      //     dataName: "nodes",
+      //   })
+      // );
 
-  return (
-    <div>
-      <Form onSubmit={(content, form) => addNote(content, form)}>
-        {({ formProps, submitting, reset }) => (
-          <form {...formProps}>
-            <Field
-              aria-required={true}
-              name="content"
-              defaultValue=""
-              // label="Username"
-              isRequired
-            >
-              {({ fieldProps, error, valid }) => (
-                <TextField
-                  onInput={(e) => changeNodeHandler(e)}
-                  placeholder="Что нужно делать?"
-                  autoComplete="off"
-                  {...fieldProps}
-                  autoFocus
-                />
-              )}
-            </Field>
-            <div className="formFooter">
-              <FormFooter>
-                <ButtonGroup>
-                  <LoadingButton
-                    type="submit"
-                    appearance="primary"
-                    isLoading={submitting}
-                    isDisabled={disable}
-                  >
-                    Создать
-                  </LoadingButton>
-                  <Button onClick={cancelAddNode} appearance="subtle">
-                    Отменить
-                  </Button>
-                </ButtonGroup>
-              </FormFooter>
-            </div>
-          </form>
-        )}
-      </Form>
-    </div>
-  );
-});
+      if (!error) {
+        form.reset({ content: "" });
+        setDisable(true);
+      }
+    };
+
+    const changeNodeHandler = useCallback((event: any) => {
+      if (event.target.value) {
+        setDisable(false);
+      } else {
+        setDisable(true);
+      }
+    }, []);
+
+    const cancelAddNode = () => {
+      setVisibleField(false);
+    };
+
+    return (
+      <div>
+        <Form onSubmit={(content, form) => addNote(content, form)}>
+          {({ formProps, submitting, reset }) => (
+            <form {...formProps}>
+              <Field
+                aria-required={true}
+                name="content"
+                defaultValue=""
+                // label="Username"
+                isRequired
+              >
+                {({ fieldProps, error, valid }) => (
+                  <TextField
+                    onInput={(e) => changeNodeHandler(e)}
+                    placeholder="Что нужно делать?"
+                    autoComplete="off"
+                    {...fieldProps}
+                    autoFocus
+                  />
+                )}
+              </Field>
+              <div className="formFooter">
+                <FormFooter>
+                  <ButtonGroup>
+                    <LoadingButton
+                      type="submit"
+                      appearance="primary"
+                      isLoading={submitting}
+                      isDisabled={disable}
+                    >
+                      Создать
+                    </LoadingButton>
+                    <Button onClick={cancelAddNode} appearance="subtle">
+                      Отменить
+                    </Button>
+                  </ButtonGroup>
+                </FormFooter>
+              </div>
+            </form>
+          )}
+        </Form>
+      </div>
+    );
+  }
+);
 
 export default AddNote;

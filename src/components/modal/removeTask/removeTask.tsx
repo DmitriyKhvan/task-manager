@@ -17,10 +17,14 @@ import styles from "./removeTask.module.scss";
 import { useMutation } from "@apollo/client";
 import { REMOVE_TASK } from "../../../apollo/Mutation";
 import { GET_COLUMNS } from "../../../apollo/Queries";
+import { updateStore } from "../../../utils/updateStore";
 
 export default function ModalRemoveTask() {
   const [removeTaskQuery, { loading, error, data }] = useMutation(REMOVE_TASK, {
-    refetchQueries: [GET_COLUMNS],
+    onCompleted: (data) => {
+      dispatch(updateStore(data.TM_removeTask.body));
+    },
+    // refetchQueries: [{ query: GET_COLUMNS }],
   });
   const { taskData } = useSelector((state: any) => state.flagReducer);
   const dispatch = useDispatch();
@@ -39,10 +43,6 @@ export default function ModalRemoveTask() {
   );
 
   const removeTaskHandler = () => {
-    // dispatch(
-    //   removeTask({ columnId: taskData.columnId, taskId: taskData.taskId })
-    // );
-
     removeTaskQuery({
       variables: {
         removedId: taskData.taskId,
@@ -51,6 +51,9 @@ export default function ModalRemoveTask() {
 
     if (!error) {
       closeModal();
+      // dispatch(
+      //   removeTask({ columnId: taskData.columnId, taskId: taskData.taskId })
+      // );
     }
   };
 

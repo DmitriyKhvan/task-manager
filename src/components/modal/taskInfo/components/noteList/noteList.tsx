@@ -9,8 +9,18 @@ import Button from "@atlaskit/button/standard-button";
 import EditorEditIcon from "@atlaskit/icon/glyph/editor/edit";
 import Select from "@atlaskit/select";
 import TrashIcon from "@atlaskit/icon/glyph/trash";
+import { useMutation } from "@apollo/client";
+import { ADD_TASK } from "../../../../../apollo/Mutation";
+import { updateStore } from "../../../../../utils/updateStore";
 
-const NoteList = (props: any) => {
+const NoteList = ({ task: { task, column, isOpen }, sort }: any) => {
+  const [addTaskQuery, { loading, error, data }] = useMutation(ADD_TASK, {
+    onCompleted: (data) => {
+      dispatch(updateStore(data.TM_addTask.body));
+    },
+    // refetchQueries: [{ query: GET_COLUMNS }],
+  });
+
   const [editFlag, setEditFlag] = useState(null);
   const dispatch = useDispatch();
   const { editTask } = toDoSlice.actions;
@@ -20,63 +30,103 @@ const NoteList = (props: any) => {
     return { label: el.title, value: el.stage };
   });
 
-  console.log("props", props);
-  console.log("columnsName", columnsName);
+  //позиция таска в столбце
+  const orderTask = column?.taskIds.findIndex(
+    (taskId: any) => taskId === task.id
+  );
 
-  const task = tasks[props.task.task.id];
+  const taskFind = tasks[task.id];
   let sortNodes: any = [];
 
-  if (props.sort.value === "date") {
-    sortNodes = task.nodes.slice().sort((a: any, b: any) => {
-      if (a[props.sort.value] > b[props.sort.value]) {
+  if (sort.value === "date") {
+    sortNodes = taskFind.nodes.slice().sort((a: any, b: any) => {
+      if (a[sort.value] > b[sort.value]) {
         return -1;
       }
-      if (a[props.sort.value] < b[props.sort.value]) {
+      if (a[sort.value] < b[sort.value]) {
         return 1;
       }
 
       return 0;
     });
-  } else if (props.sort.value === "status") {
-    const toDoNode = task.nodes.filter((node: any) => node.stage === "to-do");
-    const completeNode = task.nodes.filter(
+  } else if (sort.value === "status") {
+    const toDoNode = taskFind.nodes.filter(
+      (node: any) => node.stage === "to-do"
+    );
+    const completeNode = taskFind.nodes.filter(
       (node: any) => node.stage === "done"
     );
-    const inProgressNode = task.nodes.filter(
+    const inProgressNode = taskFind.nodes.filter(
       (node: any) => node.stage !== "to-do" && node.stage !== "done"
     );
 
     sortNodes = [...toDoNode, ...inProgressNode, ...completeNode];
   } else {
-    sortNodes = task.nodes.slice();
+    sortNodes = taskFind.nodes.slice();
   }
 
   const changeNodeText: any = (value: any, idx: any, stage: any) => {
-    setEditFlag(null);
-    const nodes = [
-      ...sortNodes.slice(0, idx),
-      { ...sortNodes[idx], content: value, stage },
-      ...sortNodes.slice(idx + 1),
-    ];
+    if (value) {
+      setEditFlag(null);
+      const nodes = [
+        ...sortNodes.slice(0, idx),
+        { ...sortNodes[idx], content: value, stage },
+        ...sortNodes.slice(idx + 1),
+      ];
 
-    dispatch(
-      editTask({
-        taskId: props.task.task.id,
-        data: nodes,
-        dataName: "nodes",
-      })
-    );
+      addTaskQuery({
+        variables: {
+          tasks: {
+            id: task.id,
+            content: task.content,
+            files: task.files,
+            flag: task.flag,
+            links: JSON.stringify(task.links),
+            marks: JSON.stringify(task.marks),
+            nodes: JSON.stringify(nodes),
+            columnId: column.id,
+            order: orderTask,
+          },
+        },
+      });
+
+      dispatch(
+        editTask({
+          taskId: task.id,
+          data: nodes,
+          dataName: "nodes",
+        })
+      );
+    }
   };
 
   const removeNode: any = (id: any) => {
-    const nodes = task.nodes.filter((node: any) => node.id !== id);
-    dispatch(
-      editTask({
-        taskId: props.task.task.id,
-        data: nodes,
-        dataName: "nodes",
-      })
-    );
+    const nodes = taskFind.nodes.filter((node: any) => node.id !== id);
+
+    addTaskQuery({
+      variables: {
+        tasks: {
+          id: task.id,
+          content: task.content,
+          files: task.files,
+          flag: task.flag,
+          links: JSON.stringify(task.links),
+          // marks: JSON.stringify(marks.value),
+          marks: JSON.stringify(task.marks),
+          nodes: JSON.stringify(nodes),
+          columnId: column.id,
+          order: orderTask,
+        },
+      },
+    });
+
+    // dispatch(
+    //   editTask({
+    //     taskId: task.id,
+    //     data: nodes,
+    //     dataName: "nodes",
+    //   })
+    // );
   };
 
   // не переносит заметки, просто меняет статус в таске
@@ -87,9 +137,26 @@ const NoteList = (props: any) => {
       ...sortNodes.slice(idx + 1),
     ];
 
+    addTaskQuery({
+      variables: {
+        tasks: {
+          id: task.id,
+          content: task.content,
+          files: task.files,
+          flag: task.flag,
+          links: JSON.stringify(task.links),
+          // marks: JSON.stringify(marks.value),
+          marks: JSON.stringify(task.marks),
+          nodes: JSON.stringify(nodes),
+          columnId: column.id,
+          order: orderTask,
+        },
+      },
+    });
+
     dispatch(
       editTask({
-        taskId: props.task.task.id,
+        taskId: task.id,
         data: nodes,
         dataName: "nodes",
       })

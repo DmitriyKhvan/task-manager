@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import moment from "moment";
 // @ts-ignore
@@ -30,7 +30,7 @@ import { fetchUploadFiles } from "../../../../../store/reducers/ActionCreators";
 import axios from "axios";
 import UploadFile from "../uploadFile/uploadFile";
 
-export default function FileList() {
+export default memo(function FileList() {
   // const [uploadfiles, setUploadFiles] = useState([]);
   const dispatch = useDispatch();
 
@@ -382,4 +382,4 @@ export default function FileList() {
       </div>
     </>
   ) : null;
-}
+});

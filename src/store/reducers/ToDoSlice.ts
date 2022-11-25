@@ -128,7 +128,7 @@ const initialState = {
         avatar: "",
       },
       date: "19.08.2022",
-      text: "Какой то текс. Просто что бы было что-то написано.",
+      text: "Какой то текст. Просто что бы было что-то написано.",
     },
     {
       id: Date.now() + 1,
@@ -152,72 +152,69 @@ export const toDoSlice = createSlice({
   initialState,
   reducers: {
     initialTaskList(state: any, action: any) {
-      const { tasksObj, columnsObj, columnOrder } = action.payload;
+      const { tasks, columns, columnOrder } = action.payload;
 
-      state.tasks = tasksObj;
-      state.columns = columnsObj;
+      state.tasks = tasks;
+      state.columns = columns;
       state.columnOrder = columnOrder;
     },
 
-    updateTodoList(state: any, action: any) {
-      const { destination, source, draggableId, type } = action.payload;
+    // updateTodoList(state: any, action: any) {
+    //   const { destination, source, draggableId, type } = action.payload;
 
-      console.log("destination", destination);
-      console.log("source", source);
-      console.log("draggableId", draggableId);
-      console.log("type", type);
+    //   console.log("destination", destination);
+    //   console.log("source", source);
+    //   console.log("draggableId", draggableId);
+    //   console.log("type", type);
 
-      if (!destination) {
-        return;
-      }
+    //   if (!destination) {
+    //     return;
+    //   }
 
-      if (
-        destination.droppableId === source.droppableId &&
-        destination.index === source.index
-      ) {
-        return;
-      }
+    //   if (
+    //     destination.droppableId === source.droppableId &&
+    //     destination.index === source.index
+    //   ) {
+    //     return;
+    //   }
 
-      if (type === "column") {
-        state.columnOrder.splice(source.index, 1);
-        state.columnOrder.splice(destination.index, 0, draggableId);
+    //   if (type === "column") {
+    //     state.columnOrder.splice(source.index, 1);
+    //     state.columnOrder.splice(destination.index, 0, draggableId);
 
-        return;
-      }
+    //     return;
+    //   }
 
-      const start = state.columns[source.droppableId];
-      const finish = state.columns[destination.droppableId];
+    //   const start = state.columns[source.droppableId];
+    //   const finish = state.columns[destination.droppableId];
 
-      if (start === finish) {
-        // const newTaskIds = Array.from(start.taskIds);
-        start?.taskIds?.splice(source.index, 1);
-        start?.taskIds?.splice(destination.index, 0, draggableId);
+    //   if (start === finish) {
+    //     // const newTaskIds = Array.from(start.taskIds);
+    //     start?.taskIds?.splice(source.index, 1);
+    //     start?.taskIds?.splice(destination.index, 0, draggableId);
 
-        return;
-      }
+    //     return start?.taskIds;
+    //   }
 
-      start?.taskIds?.splice(source.index, 1);
+    //   start?.taskIds?.splice(source.index, 1);
 
-      finish?.taskIds.splice(destination.index, 0, draggableId);
-    },
+    //   finish?.taskIds.splice(destination.index, 0, draggableId);
+    // },
 
     addTask(state: any, action) {
       const id = `task-${Date.now().toString()}`;
+      const { value, columnId, position } = action.payload;
 
       state.tasks[id] = {
         id,
-        content: action.payload.value,
-        marks: "[]",
-        nodes: "[]",
+        content: value,
+        marks: [],
+        nodes: [],
         flag: false,
-        links: "[]",
+        links: [],
       };
 
-      state.columns[action.payload.columnId].taskIds.splice(
-        action.payload.position,
-        0,
-        id
-      );
+      state.columns[columnId].taskIds.splice(position, 0, id);
     },
 
     addColumn(state: any, action) {
@@ -226,6 +223,7 @@ export const toDoSlice = createSlice({
         id,
         title: "",
         taskIds: [],
+        taskLimit: null,
       };
 
       state.columnOrder.push(id);

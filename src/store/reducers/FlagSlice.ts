@@ -25,12 +25,14 @@ const initialState = {
   modalTaskData: {
     isOpen: false,
     task: null,
+    column: null,
   },
 
   taskLinks: {
     isOpen: false,
     task: null,
     links: null,
+    column: null,
   },
 
   fromColumnId: null,
@@ -77,19 +79,21 @@ export const flagSlice = createSlice({
     },
 
     setModalTaskData(state, action) {
-      const { isOpen, task } = action.payload;
+      const { isOpen, task, column } = action.payload;
       state.modalTaskData = {
         isOpen,
         task,
+        column,
       };
     },
 
     modalTaskLinks(state, action) {
-      const { isOpen, task, links } = action.payload;
+      const { isOpen, task, links, column } = action.payload;
       state.taskLinks = {
         isOpen,
         task,
         links,
+        column,
       };
     },
 

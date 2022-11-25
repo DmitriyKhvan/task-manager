@@ -1,4 +1,4 @@
-import React, { memo, useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import { useRef } from "react";
 import Select from "@atlaskit/select";
 import "./infoTaskAccord.scss";
@@ -10,11 +10,14 @@ import { flagSlice } from "../../store/reducers/FlagSlice";
 import FlagFilledIcon from "@atlaskit/icon/glyph/flag-filled";
 import Tooltip from "@atlaskit/tooltip";
 import moment from "moment";
-// @ts-ignore
-import localization from "moment/locale/ru";
+
+import "moment/locale/ru";
 
 import { CreatableSelect } from "@atlaskit/select";
 import FormCustomSelectFieldExample from "./components/selectAvatar/selectAvatar";
+import { useMutation } from "@apollo/client";
+import { ADD_TASK } from "../../apollo/Mutation";
+import { updateStore } from "../../utils/updateStore";
 
 const createOption = (label: any) => ({
   label,
@@ -35,15 +38,26 @@ const defaultOptions = [
   { label: "Sydney", value: "sydney" },
 ];
 
-const MarksSelector = (props: any) => {
-  selectOptions = props.task.marks;
+const MarksSelector = ({ task, column, changeMaskHandler }: any) => {
+  const [addTaskQuery, { loading, error, data }] = useMutation(ADD_TASK, {
+    onCompleted: (data) => {
+      dispatch(updateStore(data.TM_addTask.body));
+    },
+    // refetchQueries: [{ query: GET_COLUMNS }],
+  });
+
+  const orderTask = column?.taskIds.findIndex(
+    (taskId: any) => taskId === task.id
+  );
+
+  selectOptions = task.marks;
   const dispatch = useDispatch();
   const { changeMarksTask } = toDoSlice.actions;
 
   const [state, setState]: any = useState({
     isLoading: false,
     options: defaultOptions,
-    value: props.task.marks,
+    value: task.marks,
   });
 
   const handleChange = (newValue: any, actionMeta: any) => {
@@ -55,12 +69,29 @@ const MarksSelector = (props: any) => {
     console.groupEnd();
     setState({ ...state, value: selectOptions });
 
-    dispatch(
-      changeMarksTask({
-        taskId: props.task.id,
-        marks: selectOptions,
-      })
-    );
+    addTaskQuery({
+      variables: {
+        tasks: {
+          id: task.id,
+          content: task.content,
+          files: task.files,
+          flag: task.flag,
+          links: JSON.stringify(task.links),
+          // marks: JSON.stringify(marks.value),
+          marks: JSON.stringify(selectOptions),
+          nodes: JSON.stringify(task.nodes),
+          columnId: column.id,
+          order: orderTask,
+        },
+      },
+    });
+
+    // dispatch(
+    //   changeMarksTask({
+    //     taskId: task.id,
+    //     marks: selectOptions,
+    //   })
+    // );
   };
 
   const handleCreate = (inputValue: any) => {
@@ -85,12 +116,29 @@ const MarksSelector = (props: any) => {
       value: selectOptions,
     });
 
-    dispatch(
-      changeMarksTask({
-        taskId: props.task.id,
-        marks: selectOptions,
-      })
-    );
+    addTaskQuery({
+      variables: {
+        tasks: {
+          id: task.id,
+          content: task.content,
+          files: task.files,
+          flag: task.flag,
+          links: JSON.stringify(task.links),
+          // marks: JSON.stringify(marks.value),
+          marks: JSON.stringify(selectOptions),
+          nodes: JSON.stringify(task.nodes),
+          columnId: column.id,
+          order: orderTask,
+        },
+      },
+    });
+
+    // dispatch(
+    //   changeMarksTask({
+    //     taskId: task.id,
+    //     marks: selectOptions,
+    //   })
+    // );
   };
 
   const { isLoading, options, value } = state;
@@ -108,7 +156,7 @@ const MarksSelector = (props: any) => {
         placeholder="Выбрать метку"
         isMulti
         closeMenuOnSelect={false}
-        onBlur={() => props.changeMaskHandler(false)}
+        onBlur={() => changeMaskHandler(false)}
         maxMenuWidth="252px"
         defaultMenuIsOpen={true}
         autoFocus={true}
@@ -117,8 +165,20 @@ const MarksSelector = (props: any) => {
   );
 };
 
-const InfoTaskAccord = memo((props: any) => {
-  console.log(props);
+const InfoTaskAccord = memo(({ taskInfo: { task, column, isOpen } }: any) => {
+  console.log("task", task);
+  useEffect(() => {
+    // moment.locale("ru");
+    console.log(moment());
+  }, []);
+
+  const [addTaskQuery, { loading, error, data }] = useMutation(ADD_TASK, {
+    onCompleted: (data) => {
+      dispatch(updateStore(data.TM_addTask.body));
+    },
+    // refetchQueries: [{ query: GET_COLUMNS }],
+  });
+
   const [changeMask, setChangeMask] = useState(false);
   const [descriptionTitle, setDescriptionTitle] = useState(false);
   const [toogleDateFormat, setToogleDateFormat] = useState(true);
@@ -128,13 +188,11 @@ const InfoTaskAccord = memo((props: any) => {
   const { transitionTask } = toDoSlice.actions;
   const { setFromColumnId } = flagSlice.actions;
 
-  const task: any = tasks[props.taskInfo.task.id];
+  const taskFind: any = tasks[task.id];
 
   const changeMaskHandler = () => {
     setChangeMask(!changeMask);
   };
-
-  console.log("columns", columns);
 
   const columnsName = Object.values(columns)
     .map((el: any) => {
@@ -143,8 +201,8 @@ const InfoTaskAccord = memo((props: any) => {
     .filter((el) => el.value !== fromColumnId);
 
   const defaultValue = {
-    label: props.taskInfo.column.title,
-    value: props.taskInfo.column.id,
+    label: column.title,
+    value: column.id,
   };
 
   const accordionHandler = (event: any) => {
@@ -162,15 +220,33 @@ const InfoTaskAccord = memo((props: any) => {
 
   // перемещение таксков в другую колонку
   const changeColumnHandler = (columnId: any) => {
-    dispatch(
-      transitionTask({
-        fromColumnId,
-        toColumnId: columnId.value,
-        taskId: props.taskInfo.task.id,
-      })
-    );
+    addTaskQuery({
+      variables: {
+        tasks: {
+          id: task.id,
+          content: task.content,
+          files: task.files,
+          flag: task.flag,
+          links: JSON.stringify(task.links),
+          marks: JSON.stringify(task.marks),
+          nodes: JSON.stringify(task.nodes),
+          columnId: columnId.value,
+          order: 0,
+        },
+      },
+    });
 
-    dispatch(setFromColumnId(columnId.value));
+    // dispatch(
+    //   transitionTask({
+    //     fromColumnId,
+    //     toColumnId: columnId.value,
+    //     taskId: task.id,
+    //   })
+    // );
+
+    if (!error) {
+      dispatch(setFromColumnId(columnId.value));
+    }
   };
 
   // const toogleDateFormatHandler = useCallback(() => {
@@ -202,7 +278,7 @@ const InfoTaskAccord = memo((props: any) => {
           onChange={changeColumnHandler}
           // defaultMenuIsOpen={true}
         />
-        {props.taskInfo.task.flag && (
+        {task.flag && (
           <div className="noted">
             <span className="icon">
               <FlagFilledIcon label=""></FlagFilledIcon>
@@ -237,12 +313,13 @@ const InfoTaskAccord = memo((props: any) => {
           {changeMask ? (
             <MarksSelector
               changeMaskHandler={changeMaskHandler}
-              task={task}
+              task={taskFind}
+              column={column}
             ></MarksSelector>
           ) : task.marks.length ? (
             <div onClick={changeMaskHandler} className="value">
               <div className="markList">
-                {JSON.parse(task.marks).map((mark: any) => (
+                {taskFind.marks.map((mark: any) => (
                   <a href="#" className="mark" key={mark.value}>
                     {mark.label}
                   </a>
@@ -270,18 +347,19 @@ const InfoTaskAccord = memo((props: any) => {
       </div>
 
       <div className="dateBlock">
-        <div>Создано 2 июня 2022 г., 16:41</div>
+        <div>Создано {moment(task.createdAt).locale("ru").format("LLL")}</div>
         <div>
           Дата обновления{" "}
           {
             // @ts-ignore
-            new Date() - new Date() - 18 * 60 * 60 * 1000 > 86400000 ? (
+            // new Date() - new Date() - 18 * 60 * 60 * 1000 > 86400000 ? (
+            new Date() - new Date(task.updatedAt) > 86400000 ? (
               <span>
                 {
                   // @ts-ignore
-                  moment(new Date() - 18 * 60 * 60 * 1000)
+                  moment(new Date(task.updatedAt))
                     // @ts-ignore
-                    .locale("ru", localization)
+                    .locale("ru")
                     .format("DD MMM YYYY HH:mm")
                 }
               </span>
@@ -294,9 +372,9 @@ const InfoTaskAccord = memo((props: any) => {
                   >
                     {
                       // @ts-ignore
-                      moment(new Date() - 18 * 60 * 60 * 1000)
+                      moment(new Date(task.updatedAt))
                         // @ts-ignore
-                        .locale("ru", localization)
+                        .locale("ru")
                         .format("DD MMM YYYY HH:mm")
                     }
                   </span>
@@ -304,9 +382,9 @@ const InfoTaskAccord = memo((props: any) => {
                   <Tooltip
                     content={
                       // @ts-ignore
-                      moment(new Date() - 18 * 60 * 60 * 1000)
+                      moment(new Date(task.updatedAt))
                         // @ts-ignore
-                        .locale("ru", localization)
+                        .locale("ru")
                         .format("DD MMM YYYY HH:mm")
                     }
                     position="right"
@@ -319,7 +397,7 @@ const InfoTaskAccord = memo((props: any) => {
                       >
                         {moment(
                           // @ts-ignore
-                          new Date() - 18 * 60 * 60 * 1000
+                          new Date(task.updatedAt)
                         )
                           .startOf("hour")
                           .fromNow()}

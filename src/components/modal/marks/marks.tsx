@@ -17,6 +17,9 @@ import { toDoSlice } from "../../../store/reducers/ToDoSlice";
 import { CreatableSelect, OptionType, ValueType } from "@atlaskit/select";
 import styles from "./marks.module.scss";
 import { useState } from "react";
+import { useMutation } from "@apollo/client";
+import { ADD_TASK } from "../../../apollo/Mutation";
+import { updateStore } from "../../../utils/updateStore";
 
 const defaultOptions = [
   { label: "Adelaide", value: "adelaide" },
@@ -38,11 +41,12 @@ const createOption = (label: any) => ({
 let selectOptions: any = [];
 
 const MarksSelector = (props: any) => {
+  selectOptions = [];
   const handleChange = (newValue: any, actionMeta: any) => {
     console.group("Value Changed");
     console.log(newValue);
     // newValue.forEach((e) => selectOptions.push(e));
-    selectOptions = [];
+    // selectOptions = [];
     newValue.forEach((e: any) => selectOptions.push(e));
     console.log(`action: ${actionMeta.action}`);
     console.groupEnd();
@@ -91,39 +95,82 @@ const MarksSelector = (props: any) => {
 };
 
 export default function ModalMarks() {
-  const { modalTaskData } = useSelector((state: any) => state.flagReducer);
+  const [addTaskQuery, { loading, error, data }] = useMutation(ADD_TASK, {
+    onCompleted: (data) => {
+      dispatch(updateStore(data.TM_addTask.body));
+    },
+    // refetchQueries: [{ query: GET_COLUMNS }],
+  });
+
+  const {
+    modalTaskData: { isOpen, task, column },
+  } = useSelector((state: any) => state.flagReducer);
   const dispatch = useDispatch();
   const { setModalTaskData } = flagSlice.actions;
   const { addMarksTask } = toDoSlice.actions;
 
-  const [state, setState] = useState({
+  const orderTask = column?.taskIds.findIndex(
+    (taskId: any) => taskId === task.id
+  );
+
+  const [marks, setMarks] = useState({
     isLoading: false,
     options: defaultOptions,
     value: [],
   });
-  const closeModal = useCallback(
-    () =>
-      dispatch(
-        setModalTaskData({
-          isOpen: false,
-          task: null,
-        })
-      ),
-    []
-  );
-
-  const addMarks = useCallback(() => {
+  const closeModal = () =>
     dispatch(
-      addMarksTask({
-        taskId: modalTaskData.task.id,
-        marks: state.value,
+      setModalTaskData({
+        isOpen: false,
+        task: null,
       })
     );
 
-    setState({ ...state, value: [] });
+  const addMarks = () => {
+    // const data = {
+    //   id: task.id,
+    //   content: task.content,
+    //   files: task.files,
+    //   flag: task.flag,
+    //   links: JSON.stringify(task.links),
+    //   // marks: JSON.stringify(marks.value),
+    //   marks: [...task.marks, ...marks.value],
+    //   nodes: JSON.stringify(task.nodes),
+    //   columnId: column.id,
+    //   order: orderTask,
+    // };
 
-    closeModal();
-  }, [addMarksTask, setState, closeModal]);
+    // console.log("1111", data);
+
+    addTaskQuery({
+      variables: {
+        tasks: {
+          id: task.id,
+          content: task.content,
+          files: task.files,
+          flag: task.flag,
+          links: JSON.stringify(task.links),
+          // marks: JSON.stringify(marks.value),
+          marks: JSON.stringify([...task.marks, ...marks.value]),
+          nodes: JSON.stringify(task.nodes),
+          columnId: column.id,
+          order: orderTask,
+        },
+      },
+    });
+    // dispatch(
+    //   addMarksTask({
+    //     taskId: task.id,
+    //     marks: marks.value,
+    //   })
+    // );
+
+    setMarks({ ...marks, value: [] });
+
+    if (!error) {
+      closeModal();
+    }
+  };
 
   // const removeColumnHandler = useCallback(() => {
   //   closeModal();
@@ -132,22 +179,20 @@ export default function ModalMarks() {
 
   return (
     <ModalTransition>
-      {modalTaskData.isOpen && (
+      {isOpen && (
         <Modal onClose={closeModal} width="medium">
           <ModalHeader>
             <ModalTitle>
               Добавить метки к ключу{" "}
-              <span style={{ textTransform: "uppercase" }}>
-                {modalTaskData.task.id}
-              </span>
+              <span style={{ textTransform: "uppercase" }}>{task.id}</span>
             </ModalTitle>
           </ModalHeader>
           <div className={styles.modalBody}>
-            <MarksSelector state={state} setState={setState}></MarksSelector>
+            <MarksSelector state={marks} setState={setMarks}></MarksSelector>
           </div>
           <ModalFooter>
             <Button
-              isDisabled={state.value.length ? false : true}
+              isDisabled={marks.value.length ? false : true}
               appearance="primary"
               onClick={addMarks}
               autoFocus

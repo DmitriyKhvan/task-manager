@@ -17,34 +17,35 @@ import styles from "./removeColumn.module.scss";
 import { useMutation } from "@apollo/client";
 import { REMOVE_COLUMN } from "../../../apollo/Mutation";
 import { GET_COLUMNS } from "../../../apollo/Queries";
+import { transformData } from "../../../utils/transformData";
+import { updateStore } from "../../../utils/updateStore";
 
 export default function ModalRemoveColumn() {
   const [removeColumnFetch, { loading, error, data }] = useMutation(
     REMOVE_COLUMN,
-    { refetchQueries: [{ query: GET_COLUMNS }] }
+    {
+      onCompleted: (data) => {
+        dispatch(updateStore(data.TM_removeColumn.body));
+      },
+      // refetchQueries: [{ query: GET_COLUMNS }]
+    }
   );
   const { columnData } = useSelector((state: any) => state.flagReducer);
-  console.log("columnData", columnData);
 
   const dispatch = useDispatch();
   const { modalDeleteColumn } = flagSlice.actions;
-  const { removeColumn } = toDoSlice.actions;
-  const closeModal = useCallback(
-    () =>
-      dispatch(
-        modalDeleteColumn({
-          isOpen: false,
-          column: null,
-        })
-      ),
-    []
-  );
+  const { removeColumn, initialTaskList } = toDoSlice.actions;
+  const closeModal = () =>
+    dispatch(
+      modalDeleteColumn({
+        isOpen: false,
+        column: null,
+      })
+    );
 
   const removeColumnHandler = () => {
     const columnId = columnData.column.id;
     if (columnId) {
-      console.log("columnId", columnId);
-
       removeColumnFetch({
         variables: {
           removedId: columnId,

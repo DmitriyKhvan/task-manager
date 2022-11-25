@@ -27,6 +27,8 @@ import declensionOfWords from "../../pipes/declensionOfWords";
 import { useMutation } from "@apollo/client";
 import { ADD_COLUMN } from "../../apollo/Mutation";
 import { GET_COLUMNS } from "../../apollo/Queries";
+import { transformData } from "../../utils/transformData";
+import { updateStore } from "../../utils/updateStore";
 
 const Title = styled.h2`
   width: 193px;
@@ -52,28 +54,16 @@ const ColumnTodo: any = styled.div`
   top: ${(props: any) => (props?.isDragging ? "223px !important" : "inherit")};
 `;
 
-// class InnerList extends React.Component {
-//   shouldComponentUpdate(nextProps) {
-//     if (nextProps.tasks === this.props.tasks) {
-//       return false;
-//     }
-//     return true;
-//   }
-
-//   render() {
-//     return this.props.tasks.map((task, index) => (
-//       <Task key={task.id} task={task} index={index} />
-//     ));
-//   }
-// }
-
 const EditTitleColumn = (props: any) => {
   const [addColumn, { loading, error, data }] = useMutation(ADD_COLUMN, {
-    refetchQueries: [{ query: GET_COLUMNS }],
+    onCompleted: (data) => {
+      dispatch(updateStore(data.TM_addColumn.body));
+    },
+    // refetchQueries: [{ query: GET_COLUMNS }],
   });
 
   const dispatch = useDispatch();
-  const { addTitleColumn } = toDoSlice?.actions;
+  const { addTitleColumn, initialTaskList } = toDoSlice?.actions;
   useEffect(() => {
     if (!props?.children) props.setFalg(false);
   }, []);
@@ -119,16 +109,24 @@ const EditTitleColumn = (props: any) => {
           </h2>
         )}
         onConfirm={(value) => {
-          if (value.trim().length) {
+          dispatch(
+            addTitleColumn({ columnId: props?.column?.id, title: value })
+          );
+
+          if (value.trim().length && value.trim() !== props.column.title) {
             addColumn({
               variables: {
-                columns: [{ taskLimit: 2, title: value }],
+                columns: [
+                  {
+                    id: props.column.id.includes("col")
+                      ? props.column.id
+                      : null,
+                    taskLimit: null,
+                    title: value,
+                  },
+                ],
               },
             });
-          } else {
-            dispatch(
-              addTitleColumn({ columnId: props?.column?.id, title: value })
-            );
           }
 
           setTimeout(() => {
