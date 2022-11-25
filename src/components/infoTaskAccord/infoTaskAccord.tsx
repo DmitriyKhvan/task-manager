@@ -11,7 +11,7 @@ import FlagFilledIcon from "@atlaskit/icon/glyph/flag-filled";
 import Tooltip from "@atlaskit/tooltip";
 import moment from "moment";
 
-import "moment/locale/ru";
+import "moment/dist/locale/ru";
 
 import { CreatableSelect } from "@atlaskit/select";
 import FormCustomSelectFieldExample from "./components/selectAvatar/selectAvatar";
@@ -166,11 +166,7 @@ const MarksSelector = ({ task, column, changeMaskHandler }: any) => {
 };
 
 const InfoTaskAccord = memo(({ taskInfo: { task, column, isOpen } }: any) => {
-  console.log("task", task);
-  useEffect(() => {
-    // moment.locale("ru");
-    console.log(moment());
-  }, []);
+  moment.locale("ru");
 
   const [addTaskQuery, { loading, error, data }] = useMutation(ADD_TASK, {
     onCompleted: (data) => {
@@ -347,22 +343,14 @@ const InfoTaskAccord = memo(({ taskInfo: { task, column, isOpen } }: any) => {
       </div>
 
       <div className="dateBlock">
-        <div>Создано {moment(task.createdAt).locale("ru").format("LLL")}</div>
+        <div>Создано {moment(task.createdAt).format("LLL")}</div>
         <div>
           Дата обновления{" "}
           {
             // @ts-ignore
             // new Date() - new Date() - 18 * 60 * 60 * 1000 > 86400000 ? (
             new Date() - new Date(task.updatedAt) > 86400000 ? (
-              <span>
-                {
-                  // @ts-ignore
-                  moment(new Date(task.updatedAt))
-                    // @ts-ignore
-                    .locale("ru")
-                    .format("DD MMM YYYY HH:mm")
-                }
-              </span>
+              <span>{moment(new Date(task.updatedAt)).format("LLL")}</span>
             ) : (
               <>
                 {toogleDateFormat ? (
@@ -370,23 +358,11 @@ const InfoTaskAccord = memo(({ taskInfo: { task, column, isOpen } }: any) => {
                     className="dateFormat"
                     onClick={toogleDateFormatHandler}
                   >
-                    {
-                      // @ts-ignore
-                      moment(new Date(task.updatedAt))
-                        // @ts-ignore
-                        .locale("ru")
-                        .format("DD MMM YYYY HH:mm")
-                    }
+                    {moment(new Date(task.updatedAt)).format("LLL")}
                   </span>
                 ) : (
                   <Tooltip
-                    content={
-                      // @ts-ignore
-                      moment(new Date(task.updatedAt))
-                        // @ts-ignore
-                        .locale("ru")
-                        .format("DD MMM YYYY HH:mm")
-                    }
+                    content={moment(new Date(task.updatedAt)).format("LLL")}
                     position="right"
                   >
                     {(tooltipProps) => (
@@ -395,10 +371,7 @@ const InfoTaskAccord = memo(({ taskInfo: { task, column, isOpen } }: any) => {
                         className="dateFormat"
                         onClick={toogleDateFormatHandler}
                       >
-                        {moment(
-                          // @ts-ignore
-                          new Date(task.updatedAt)
-                        )
+                        {moment(new Date(task.updatedAt))
                           .startOf("hour")
                           .fromNow()}
                       </span>
