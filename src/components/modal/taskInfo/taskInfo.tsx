@@ -36,7 +36,6 @@ import "./taskInfo.scss";
 import TextArea from "@atlaskit/textarea";
 import InlineEdit from "@atlaskit/inline-edit";
 import { toDoSlice } from "../../../store/reducers/ToDoSlice";
-import InfoTaskAccord from "../../infoTaskAccord/infoTaskAccord";
 
 import ChildIssuesIcon from "@atlaskit/icon/glyph/child-issues";
 
@@ -67,54 +66,11 @@ import ModalRemoveTaskLink from "../removeTaskLink/relmoveTaskLink";
 import UploadFile from "./components/uploadFile/uploadFile";
 import FileList from "./components/fileList/fileList";
 import NoteList from "./components/noteList/noteList";
-
-const EditTask = (props: any) => {
-  const [editContent, setEditContent] = useState(props.task.content);
-  const dispatch = useDispatch();
-  const { editTask } = toDoSlice.actions;
-
-  const editTaskHandler = (content: any) => {
-    if (content.trim()) {
-      setEditContent(content);
-      dispatch(
-        editTask({
-          taskId: props.task.id,
-          data: content,
-          dataName: "content",
-        })
-      );
-    }
-  };
-
-  const changeHeight = () => {};
-
-  return (
-    <div className="wrapStyles">
-      <InlineEdit
-        defaultValue={editContent}
-        // label="Inline edit textarea (keeps edit view on blur)"
-        editView={({ errorMessage, ...fieldProps }: any, ref) => (
-          // @ts-ignore - textarea does not pass through ref as a prop
-          <h1>
-            <TextArea
-              rows={1}
-              {...fieldProps}
-              ref={ref}
-              className="editTextAreaTask"
-            />
-          </h1>
-        )}
-        readView={() => <div className="taskTitle">{editContent}</div>}
-        onEdit={changeHeight}
-        onConfirm={editTaskHandler}
-        // keepEditViewOpenOnBlur
-        // startWithEditViewOpen
-        readViewFitContainerWidth
-        isRequired
-      />
-    </div>
-  );
-};
+import { useMutation } from "@apollo/client";
+import { ADD_TASK } from "../../../apollo/Mutation";
+import { updateStore } from "../../../utils/updateStore";
+import EditTask from "./components/editTask/editTask";
+import InfoTaskAccord from "./components/infoTaskAccord/infoTaskAccord";
 
 export default memo(function TaskInfo() {
   const [drag, setDrag] = useState(false);
@@ -126,6 +82,9 @@ export default memo(function TaskInfo() {
   const [sort, setSort] = useState({ value: "", label: "" });
 
   const { taskInfo } = useSelector((state: any) => state.flagReducer);
+
+  console.log("taskInfo", taskInfo);
+
   const { tasks, columns } = useSelector((state: any) => state.toDoReducer);
 
   const { setFiles } = toDoSlice.actions;
@@ -383,7 +342,10 @@ export default memo(function TaskInfo() {
                       {/* <ModalTitle>{taskInfo.task.content}</ModalTitle> */}
                       <div className="leftPartContent">
                         <div className="leftPartContentWrap">
-                          <EditTask task={taskInfo.task}></EditTask>
+                          <EditTask
+                            task={taskInfo.task}
+                            column={taskInfo.column}
+                          ></EditTask>
                           <div className="buttonGroup">
                             <ButtonGroup>
                               <UploadFile

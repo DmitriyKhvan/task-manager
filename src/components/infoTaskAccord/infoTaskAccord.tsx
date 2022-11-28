@@ -372,7 +372,7 @@ const InfoTaskAccord = memo(({ taskInfo: { task, column, isOpen } }: any) => {
                         onClick={toogleDateFormatHandler}
                       >
                         {moment(new Date(task.updatedAt))
-                          .startOf("hour")
+                          // .startOf("hour")
                           .fromNow()}
                       </span>
                     )}

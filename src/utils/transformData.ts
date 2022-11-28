@@ -9,6 +9,7 @@ export const arrayToObject = (data: Array<any>) => {
 
 export const transformData = (data: any) => {
   let { tasks, columns, columnOrder } = data;
+  console.log(tasks);
 
   tasks = tasks.map((task: any) => {
     return {
@@ -16,6 +17,8 @@ export const transformData = (data: any) => {
       links: JSON.parse(task.links),
       marks: JSON.parse(task.marks),
       nodes: JSON.parse(task.nodes),
+      createdAt: task.createdAt.replace("T", " ").replace("Z", " "),
+      updatedAt: task.updatedAt.replace("T", " ").replace("Z", " "),
     };
   });
 
