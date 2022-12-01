@@ -29,7 +29,6 @@ import {
   SET_COLUMN_ORDER,
   SET_TASK_ORDER,
 } from "../../apollo/Mutation";
-import { useGetColumnsQuery } from "../../hooks/useGetColumnsQuery";
 import { updateStore } from "../../utils/updateStore";
 
 const InnerList = memo((props: any) => {
@@ -78,7 +77,7 @@ const ToDoList = () => {
     },
   });
 
-  const [setTaskOrder, { errorTaskOrder }] = useMutation(SET_TASK_ORDER, {
+  const [setTaskOrder, {}] = useMutation(SET_TASK_ORDER, {
     // onCompleted: (data) => {
     //   dispatch(updateStore(data.TM_setTaskOrder.body));
     // },

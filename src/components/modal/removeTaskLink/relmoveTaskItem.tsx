@@ -18,7 +18,7 @@ import { useMutation } from "@apollo/client";
 import { ADD_TASK } from "../../../apollo/Mutation";
 import { updateStore } from "../../../utils/updateStore";
 
-export default function ModalRemoveTaskLink() {
+export default function ModalRemoveTaskItem() {
   const [addTaskQuery, { loading, error, data }] = useMutation(ADD_TASK, {
     onCompleted: (data) => {
       dispatch(updateStore(data.TM_addTask.body));
@@ -26,39 +26,23 @@ export default function ModalRemoveTaskLink() {
     // refetchQueries: [{ query: GET_COLUMNS }],
   });
 
-  const { taskLinks } = useSelector((state: any) => state.flagReducer);
+  const { taskEdit } = useSelector((state: any) => state.flagReducer);
   const dispatch = useDispatch();
-  const { modalTaskLinks }: any = flagSlice.actions;
+  const { modalTaskEdit }: any = flagSlice.actions;
   const { removeTaskLink }: any = toDoSlice.actions;
-
-  const orderTask = taskLinks.column?.taskIds.findIndex(
-    (taskId: any) => taskId === taskLinks.task?.id
-  );
 
   const closeModal = () =>
     dispatch(
-      modalTaskLinks({
+      modalTaskEdit({
         isOpen: false,
         task: null,
-        links: null,
-        column: null,
       })
     );
 
   const removeTaskLinkHandler: any = () => {
     addTaskQuery({
       variables: {
-        tasks: {
-          id: taskLinks.task.id,
-          content: taskLinks.task.content,
-          files: taskLinks.task.files,
-          flag: taskLinks.task.flag,
-          links: JSON.stringify(taskLinks.links),
-          marks: JSON.stringify(taskLinks.task.marks),
-          nodes: JSON.stringify(taskLinks.task.nodes),
-          columnId: taskLinks.column.id,
-          order: orderTask,
-        },
+        tasks: taskEdit.task,
       },
     });
 
@@ -72,16 +56,12 @@ export default function ModalRemoveTaskLink() {
 
   return (
     <ModalTransition>
-      {taskLinks.isOpen && (
+      {taskEdit.isOpen && (
         <Modal onClose={closeModal} width="small">
           <ModalHeader>
-            <ModalTitle appearance="danger">
-              Удалить эту ссылку на веб-страницу?
-            </ModalTitle>
+            <ModalTitle appearance="danger">{taskEdit.title}</ModalTitle>
           </ModalHeader>
-          <ModalBody>
-            <p>При желании вы сможете добавить ссылку снова.</p>
-          </ModalBody>
+          <ModalBody>{taskEdit.content}</ModalBody>
           <ModalFooter>
             <Button
               appearance="primary"

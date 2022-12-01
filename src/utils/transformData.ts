@@ -14,6 +14,7 @@ export const transformData = (data: any) => {
   tasks = tasks.map((task: any) => {
     return {
       ...task,
+      files: JSON.parse(task.files),
       links: JSON.parse(task.links),
       marks: JSON.parse(task.marks),
       nodes: JSON.parse(task.nodes),

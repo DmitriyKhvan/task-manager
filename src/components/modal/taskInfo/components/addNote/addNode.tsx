@@ -48,7 +48,7 @@ const AddNote = memo(
           tasks: {
             id: task.id,
             content: task.content,
-            files: task.files,
+            files: JSON.stringify(task.files),
             flag: task.flag,
             links: JSON.stringify(task.links),
             // marks: JSON.stringify(marks.value),

@@ -321,10 +321,14 @@ export const toDoSlice = createSlice({
     },
 
     setUploadFiles(state: any, action) {
-      const { file } = action.payload;
+      const { file, task, uploadFileToGraphQl } = action.payload;
       console.log("file", file);
       // state.uploadFiles = state.uploadFiles.push(file);
-      state.uploadFiles = [...state.uploadFiles, file];
+      // state.uploadFiles = [...state.uploadFiles, file];
+
+      state.tasks[task.id].files = [...state.tasks[task.id].files, file];
+      uploadFileToGraphQl(state.tasks[task.id].files);
+
       state.progresCurrentFile = null;
       state.files = [...state.files.slice(1)];
       console.log("state.uploadFiles", state.uploadFiles);

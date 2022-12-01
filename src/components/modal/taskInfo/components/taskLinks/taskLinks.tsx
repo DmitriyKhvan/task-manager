@@ -6,11 +6,12 @@ import Tooltip from "@atlaskit/tooltip";
 import EditorCloseIcon from "@atlaskit/icon/glyph/editor/close";
 import WorldIcon from "@atlaskit/icon/glyph/world";
 import EditorAddIcon from "@atlaskit/icon/glyph/editor/add";
+import EditorLinkIcon from "@atlaskit/icon/glyph/editor/link";
 
 import styles from "./taskLinks.module.scss";
 import { useDispatch } from "react-redux";
 import { flagSlice } from "../../../../../store/reducers/FlagSlice";
-import favicon from "../../../../../assets/world.svg";
+import favicon from "../../../../../assets/link.svg";
 import axios from "axios";
 
 const TaskLinks = memo(
@@ -19,56 +20,36 @@ const TaskLinks = memo(
 
     const { tasks } = useSelector((state: any) => state.toDoReducer);
     const dispatch = useDispatch();
-    const { modalTaskLinks } = flagSlice.actions;
+    const { modalTaskEdit } = flagSlice.actions;
 
     const taskFind = tasks[task.id];
 
     const modalLinkHandler = (id: any) => {
       const links = taskFind.links.filter((link: any) => link.id !== id);
+      const orderTask = column?.taskIds.findIndex(
+        (taskId: any) => taskId === taskFind?.id
+      );
 
+      const taskEdit = {
+        id: taskFind.id,
+        columnId: column.id,
+        content: taskFind.content,
+        flag: taskFind.flag,
+        links: JSON.stringify(links),
+        marks: JSON.stringify(taskFind.marks),
+        files: JSON.stringify(taskFind.files),
+        nodes: JSON.stringify(taskFind.nodes),
+        order: orderTask,
+      };
       dispatch(
-        modalTaskLinks({
+        modalTaskEdit({
           isOpen: true,
-          task,
-          links,
-          column,
+          task: taskEdit,
+          title: "Удалить эту ссылку на веб-страницу?",
+          content: <p>При желании вы сможете добавить ссылку снова.</p>,
         })
       );
     };
-
-    // const [favicon, setFavicon] = useState("");
-
-    // useEffect(() => {
-    //   const faviconFetch = async (u) => {
-    //     console.log(u);
-    //     try {
-    //       const favicon = await axios.get(`https://${u.host}/favicon.ico`);
-    //       console.log("favicon", favicon);
-    //       setFavicon(favicon);
-
-    //       return favicon;
-    //     } catch (error) {
-    //       console.log(error);
-    //     }
-    //   };
-
-    //   const u = new URL(task.links[0].url);
-
-    //   faviconFetch(u);
-    // }, []);
-
-    // const faviconFetch = async (u) => {
-    //   console.log(u);
-    //   try {
-    //     const favicon = await axios.get(`https://${u.host}/favicon.ico`);
-    //     console.log("favicon", favicon);
-    //     setFavicon(favicon);
-
-    //     return favicon;
-    //   } catch (error) {
-    //     console.log("error", error);
-    //   }
-    // };
 
     const errorImg = (e: any) => {
       console.log("errorImg", e);

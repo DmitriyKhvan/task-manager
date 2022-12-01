@@ -61,7 +61,6 @@ import AttachmentIcon from "@atlaskit/icon/glyph/attachment";
 import AddNote from "./components/addNote/addNode";
 import AddLink from "./components/addLink/addLink";
 import TaskLinks from "./components/taskLinks/taskLinks";
-import ModalRemoveTaskLink from "../removeTaskLink/relmoveTaskLink";
 
 import UploadFile from "./components/uploadFile/uploadFile";
 import FileList from "./components/fileList/fileList";
@@ -71,6 +70,7 @@ import { ADD_TASK } from "../../../apollo/Mutation";
 import { updateStore } from "../../../utils/updateStore";
 import EditTask from "./components/editTask/editTask";
 import InfoTaskAccord from "./components/infoTaskAccord/infoTaskAccord";
+import ModalRemoveTaskItem from "../removeTaskLink/relmoveTaskItem";
 
 export default memo(function TaskInfo() {
   const [drag, setDrag] = useState(false);
@@ -349,6 +349,8 @@ export default memo(function TaskInfo() {
                           <div className="buttonGroup">
                             <ButtonGroup>
                               <UploadFile
+                                task={taskInfo.task}
+                                column={taskInfo.column}
                                 visibleWorld={visibleWorld}
                                 tooltipContent="Добавить вложение"
                               ></UploadFile>
@@ -421,7 +423,10 @@ export default memo(function TaskInfo() {
                             </ButtonGroup>
                           </div>
 
-                          <FileList></FileList>
+                          <FileList
+                            task={taskInfo.task}
+                            column={taskInfo.column}
+                          ></FileList>
 
                           {nodes ? (
                             <>
@@ -633,7 +638,7 @@ export default memo(function TaskInfo() {
         )}
       </ModalTransition>
 
-      <ModalRemoveTaskLink></ModalRemoveTaskLink>
+      <ModalRemoveTaskItem></ModalRemoveTaskItem>
     </div>
   );
 });

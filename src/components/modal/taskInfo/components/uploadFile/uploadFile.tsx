@@ -9,9 +9,53 @@ import { useSelector } from "react-redux";
 import { flagSlice } from "../../../../../store/reducers/FlagSlice";
 import { fetchUploadFiles } from "../../../../../store/reducers/ActionCreators";
 import Tooltip from "@atlaskit/tooltip";
+import { useMutation } from "@apollo/client";
+import { ADD_TASK } from "../../../../../apollo/Mutation";
+import { updateStore } from "../../../../../utils/updateStore";
 
 export default memo(function UploadFile(props: any) {
+  const [addTaskQuery, { loading, error, data }] = useMutation(ADD_TASK, {
+    // onCompleted: (data) => {
+    //   dispatch(updateStore(data.TM_addTask.body));
+    // },
+    // refetchQueries: [{ query: GET_COLUMNS }],
+  });
+
+  const { tasks, columns } = useSelector((state: any) => state.toDoReducer);
+
+  const { task, column, tooltipContent, visibleWorld, icon, appearance } =
+    props;
+
+  const orderTask = column?.taskIds.findIndex(
+    (taskId: any) => taskId === task.id
+  );
+
+  const taskFind = tasks[task?.id];
+  console.log("taskFind77777777777777777777", taskFind);
+
+  const uploadFileToGraphQl = (file: any) => {
+    console.log("filefilefilefile", file);
+
+    addTaskQuery({
+      variables: {
+        tasks: {
+          id: taskFind.id,
+          content: taskFind.content,
+          files: JSON.stringify(file),
+          flag: taskFind.flag,
+          links: JSON.stringify(taskFind.links),
+          // marks: JSON.stringify(marks.value),
+          marks: JSON.stringify(taskFind.marks),
+          nodes: JSON.stringify(taskFind.nodes),
+          columnId: column.id,
+          order: orderTask,
+        },
+      },
+    });
+  };
+
   // const [uploadfiles, setUploadFiles] = useState([]);
+
   const fileInput: any = useRef(null);
   const dispatch = useDispatch();
 
@@ -33,11 +77,18 @@ export default memo(function UploadFile(props: any) {
         tempFiles.push(currentFiles[i]);
       }
 
-      dispatch(setFiles({ files: tempFiles }));
+      dispatch(setFiles({ files: tempFiles })); // выбранные файлы для загрузки
 
       for (let i = 0; i < currentFiles.length; i++) {
         // debugger;
-        await dispatch(fetchUploadFiles(currentFiles[i]));
+        await dispatch(
+          fetchUploadFiles(
+            currentFiles[i],
+            taskFind,
+            column,
+            uploadFileToGraphQl
+          )
+        );
         // dispatch(deleteFile());
       }
     }
@@ -54,17 +105,17 @@ export default memo(function UploadFile(props: any) {
         multiple
       />
 
-      <Tooltip content={props.tooltipContent}>
+      <Tooltip content={tooltipContent}>
         {(tooltipProps) => (
           <Button
             // style={{ width: props.width, height: props.height }}
             {...tooltipProps}
             onClick={uploadFile}
-            iconBefore={props.icon || <AttachmentIcon label="" size="medium" />}
-            appearance={props.appearance || ""}
+            iconBefore={icon || <AttachmentIcon label="" size="medium" />}
+            appearance={appearance || ""}
             // onClick={}
           >
-            {props.visibleWorld && <>Прикрепить</>}
+            {visibleWorld && <>Прикрепить</>}
           </Button>
         )}
       </Tooltip>

@@ -12,6 +12,7 @@ import TrashIcon from "@atlaskit/icon/glyph/trash";
 import { useMutation } from "@apollo/client";
 import { ADD_TASK } from "../../../../../apollo/Mutation";
 import { updateStore } from "../../../../../utils/updateStore";
+import { flagSlice } from "../../../../../store/reducers/FlagSlice";
 
 const NoteList = ({ task: { task, column, isOpen }, sort }: any) => {
   const [addTaskQuery, { loading, error, data }] = useMutation(ADD_TASK, {
@@ -24,6 +25,8 @@ const NoteList = ({ task: { task, column, isOpen }, sort }: any) => {
   const [editFlag, setEditFlag] = useState(null);
   const dispatch = useDispatch();
   const { editTask } = toDoSlice.actions;
+  const { modalTaskEdit } = flagSlice.actions;
+
   const { tasks, columns } = useSelector((state: any) => state.toDoReducer);
   const columnsName = Object.values(columns).map((el: any) => {
     // return { label: el.title, value: el.id };
@@ -100,25 +103,45 @@ const NoteList = ({ task: { task, column, isOpen }, sort }: any) => {
     }
   };
 
-  const removeNode: any = (id: any) => {
+  const modalNodeHandler = (id: any) => {
     const nodes = taskFind.nodes.filter((node: any) => node.id !== id);
 
-    addTaskQuery({
-      variables: {
-        tasks: {
-          id: task.id,
-          content: task.content,
-          files: task.files,
-          flag: task.flag,
-          links: JSON.stringify(task.links),
-          // marks: JSON.stringify(marks.value),
-          marks: JSON.stringify(task.marks),
-          nodes: JSON.stringify(nodes),
-          columnId: column.id,
-          order: orderTask,
-        },
-      },
-    });
+    const taskEdit = {
+      id: taskFind.id,
+      columnId: column.id,
+      content: taskFind.content,
+      flag: taskFind.flag,
+      links: JSON.stringify(taskFind.links),
+      marks: JSON.stringify(taskFind.marks),
+      files: JSON.stringify(taskFind.files),
+      nodes: JSON.stringify(nodes),
+      order: orderTask,
+    };
+    dispatch(
+      modalTaskEdit({
+        isOpen: true,
+        task: taskEdit,
+        title: "Удалить заметку?",
+        content: <p>Она будет удалена без возможности восстановления.</p>,
+      })
+    );
+
+    // addTaskQuery({
+    //   variables: {
+    //     tasks: {
+    //       id: task.id,
+    //       content: task.content,
+    //       files: JSON.stringify(task.files),
+    //       flag: task.flag,
+    //       links: JSON.stringify(task.links),
+    //       // marks: JSON.stringify(marks.value),
+    //       marks: JSON.stringify(task.marks),
+    //       nodes: JSON.stringify(nodes),
+    //       columnId: column.id,
+    //       order: orderTask,
+    //     },
+    //   },
+    // });
 
     // dispatch(
     //   editTask({
@@ -258,7 +281,7 @@ const NoteList = ({ task: { task, column, isOpen }, sort }: any) => {
                       <TrashIcon label="" primaryColor="" size="medium" />
                     }
                     appearance="subtle"
-                    onClick={() => removeNode(node.id)}
+                    onClick={() => modalNodeHandler(node.id)}
                   ></Button>
                   {/* )}
                   </Tooltip> */}

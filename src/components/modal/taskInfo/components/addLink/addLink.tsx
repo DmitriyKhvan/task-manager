@@ -61,7 +61,7 @@ const AddLink = memo(
           tasks: {
             id: task.id,
             content: task.content,
-            files: task.files,
+            files: JSON.stringify(task.files),
             flag: task.flag,
             links: JSON.stringify(links),
             marks: JSON.stringify(task.marks),

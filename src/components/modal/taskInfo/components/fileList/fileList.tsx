@@ -29,17 +29,55 @@ import { fetchUploadFiles } from "../../../../../store/reducers/ActionCreators";
 
 import axios from "axios";
 import UploadFile from "../uploadFile/uploadFile";
+import { useMutation } from "@apollo/client";
+import { ADD_TASK } from "../../../../../apollo/Mutation";
+import { updateStore } from "../../../../../utils/updateStore";
+import uploadFile from "../uploadFile/uploadFile";
 
-export default memo(function FileList() {
-  // const [uploadfiles, setUploadFiles] = useState([]);
+export default memo(function FileList(props: any) {
+  const [page, setPage] = useState(1);
   const dispatch = useDispatch();
+  const { modalTaskEdit } = flagSlice.actions;
 
-  const { files, uploadFiles, progresCurrentFile } = useSelector(
+  const { task, column } = props;
+
+  const { files, tasks, progresCurrentFile } = useSelector(
     (state: any) => state.toDoReducer
   );
-  console.log(files);
-  console.log(uploadFiles);
-  const { setFiles } = toDoSlice.actions;
+
+  const taskFind = tasks[task.id];
+  const filesUpload = taskFind.files.slice(6 * (page - 1), 6 * page);
+
+  console.log("filesUpload", filesUpload);
+
+  const modalFileHandler = (id: any) => {
+    const files = taskFind.files.filter((file: any) => file.id !== id);
+
+    const orderTask = column?.taskIds.findIndex(
+      (taskId: any) => taskId === taskFind.id
+    );
+
+    const taskEdit = {
+      id: taskFind.id,
+      columnId: column.id,
+      content: taskFind.content,
+      flag: taskFind.flag,
+      links: JSON.stringify(taskFind.links),
+      marks: JSON.stringify(taskFind.marks),
+      files: JSON.stringify(files),
+      nodes: JSON.stringify(taskFind.nodes),
+      order: orderTask,
+    };
+
+    dispatch(
+      modalTaskEdit({
+        isOpen: true,
+        task: taskEdit,
+        title: "Удалить вложение?",
+        content: <p>Он будет удален без возможности восстановления.</p>,
+      })
+    );
+  };
 
   const downloadFile = (id: any, name: any) => {
     const url = `http://10.1.1.177:9002/file/downloadById?id=${id}&name=${name}`;
@@ -77,10 +115,6 @@ export default memo(function FileList() {
   //   });
   // };
 
-  // useEffect(() => {
-  //   dispatch(fetchUploadFiles(uploadfiles));
-  // }, []);
-
   const iconType: any = {
     "application/pdf": "pdf-document",
     "image/svg+xml": "image",
@@ -102,12 +136,15 @@ export default memo(function FileList() {
   const pagination = (e: any, page: any) => {
     console.log(e);
     console.log(page);
+    setPage(page);
   };
 
-  return uploadFiles.length || files.length ? (
+  return taskFind.files.length || files.length ? (
     <>
       <div className={styles.fileListTitleBlock}>
-        <h4 className={styles.fileListTitle}>Вложения ({files.length})</h4>
+        <h4 className={styles.fileListTitle}>
+          Вложения ({files.length || taskFind.files.length})
+        </h4>
         <div className={styles.funcBlock}>
           <DropdownMenu
             placement="bottom-end"
@@ -131,6 +168,8 @@ export default memo(function FileList() {
 
           <div className={styles.addFiles}>
             <UploadFile
+              task={taskFind}
+              column={column}
               icon={<EditorAddIcon label="" size="medium" />}
               appearance="subtle"
               visibleWorld={false}
@@ -161,8 +200,9 @@ export default memo(function FileList() {
             </tr>
           </thead>
           <tbody>
-            {uploadFiles &&
-              uploadFiles.map((file: any) => {
+            {/* загруженные файлы на сервер */}
+            {filesUpload.length &&
+              filesUpload.map((file: any) => {
                 return (
                   <tr key={file.id}>
                     <td>
@@ -201,8 +241,9 @@ export default memo(function FileList() {
                         .format("DD MMM YYYY HH:mm")}
                     </td>
                     <td>
-                      2
+                      {/* 2 */}
                       <Button
+                        onClick={() => modalFileHandler(file.id)}
                         style={{ fontSize: "14px" }}
                         iconBefore={<TrashIcon label="" size="medium" />}
                         appearance="subtle"
@@ -229,6 +270,7 @@ export default memo(function FileList() {
                 );
               })}
 
+            {/* файлы в процессе загрузки */}
             {progresCurrentFile && (
               <tr key={progresCurrentFile.lastModified}>
                 <td>
@@ -310,6 +352,7 @@ export default memo(function FileList() {
               </tr>
             )}
 
+            {/* файлы выбранные для загрузки */}
             {files &&
               files.map((file: any) => {
                 return (
@@ -376,7 +419,10 @@ export default memo(function FileList() {
         <div className={styles.pagination}>
           <Pagination
             onChange={(e, page) => pagination(e, page)}
-            pages={[1, 2]}
+            pages={Array.from(
+              { length: Math.ceil(taskFind.files.length / 6) },
+              (v, k) => k + 1
+            )}
           />
         </div>
       </div>
