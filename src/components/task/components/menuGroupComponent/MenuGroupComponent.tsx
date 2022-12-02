@@ -52,7 +52,7 @@ const MenuGroupComponent = ({ column, task }: any) => {
         tasks: {
           id: task.id,
           content: task.content,
-          files: task.files,
+          files: JSON.stringify(task.files),
           flag: value,
           links: JSON.stringify(task.links),
           marks: JSON.stringify(task.marks),

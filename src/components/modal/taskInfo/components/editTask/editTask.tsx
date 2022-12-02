@@ -42,7 +42,7 @@ const EditTask = (props: any) => {
           tasks: {
             id: task.id,
             content: content,
-            files: task.files,
+            files: JSON.stringify(task.files),
             flag: task.flag,
             links: JSON.stringify(task.links),
             marks: JSON.stringify(task.marks),

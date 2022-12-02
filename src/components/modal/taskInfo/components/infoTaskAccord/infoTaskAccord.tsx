@@ -42,6 +42,15 @@ const InfoTaskAccord = memo(({ taskInfo: { task, column, isOpen } }: any) => {
     setChangeMask(!changeMask);
   };
 
+  console.log(
+    "Object.values(columns)",
+    Object.values(columns).find((col: any) => col.taskIds.includes(taskFind.id))
+  );
+
+  const columnFind: any = Object.values(columns).find((col: any) =>
+    col.taskIds.includes(taskFind.id)
+  );
+
   const columnsName = Object.values(columns)
     .map((el: any) => {
       return { label: el.title, value: el.id };
@@ -49,8 +58,8 @@ const InfoTaskAccord = memo(({ taskInfo: { task, column, isOpen } }: any) => {
     .filter((el) => el.value !== fromColumnId);
 
   const defaultValue = {
-    label: column.title,
-    value: column.id,
+    label: columnFind.title,
+    value: columnFind.id,
   };
 
   // const accordionHandler = (event: any) => {
@@ -73,14 +82,15 @@ const InfoTaskAccord = memo(({ taskInfo: { task, column, isOpen } }: any) => {
     addTaskQuery({
       variables: {
         tasks: {
-          id: task.id,
-          content: task.content,
-          files: task.files,
-          flag: task.flag,
-          links: JSON.stringify(task.links),
-          marks: JSON.stringify(task.marks),
-          nodes: JSON.stringify(task.nodes),
+          id: taskFind.id,
+          content: taskFind.content,
+          files: JSON.stringify(taskFind.files),
+          flag: taskFind.flag,
+          links: JSON.stringify(taskFind.links),
+          marks: JSON.stringify(taskFind.marks),
+          nodes: JSON.stringify(taskFind.nodes),
           columnId: columnId.value,
+          // columnId: columnFind.id,
           order: 0,
         },
       },

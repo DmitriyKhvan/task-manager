@@ -59,13 +59,13 @@ const AddLink = memo(
       addTaskQuery({
         variables: {
           tasks: {
-            id: task.id,
-            content: task.content,
-            files: JSON.stringify(task.files),
-            flag: task.flag,
+            id: taskFind.id,
+            content: taskFind.content,
+            files: JSON.stringify(taskFind.files),
+            flag: taskFind.flag,
             links: JSON.stringify(links),
-            marks: JSON.stringify(task.marks),
-            nodes: JSON.stringify(task.nodes),
+            marks: JSON.stringify(taskFind.marks),
+            nodes: JSON.stringify(taskFind.nodes),
             columnId: column.id,
             order: orderTask,
           },

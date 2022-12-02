@@ -6,7 +6,7 @@ import React, {
   useState,
   useEffect,
 } from "react";
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery, useSubscription } from "@apollo/client";
 import styled from "styled-components";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import Column from "../column/column";
@@ -30,6 +30,7 @@ import {
   SET_TASK_ORDER,
 } from "../../apollo/Mutation";
 import { updateStore } from "../../utils/updateStore";
+import { ADD_TASK_SUB } from "../../apollo/subscription";
 
 const InnerList = memo((props: any) => {
   const { searchValue } = useSelector((state: any) => state.toDoReducer);
@@ -64,7 +65,11 @@ const ToDoList = () => {
   const { setAddTaskBtnFlag } = flagSlice.actions;
   const dispatch = useDispatch();
 
-  const { loading, error, data } = useQuery(GET_COLUMNS, {
+  const {
+    loading,
+    error,
+    data: initialData,
+  } = useQuery(GET_COLUMNS, {
     onCompleted: (data) => {
       //redux thunk
       dispatch(updateStore(data.TM_getColumns.body));
@@ -74,6 +79,17 @@ const ToDoList = () => {
       //   columns: columnsObj,
       //   columnOrder,
       // });
+    },
+  });
+
+  const {
+    loading: load,
+    error: err,
+    data,
+  } = useSubscription(ADD_TASK_SUB, {
+    onSubscriptionData: (data: any) => {
+      console.log("data.taskAdded.body ----", data);
+      dispatch(updateStore(data.subscriptionData.data.taskAdded.body));
     },
   });
 
@@ -219,7 +235,7 @@ const ToDoList = () => {
         tasks: {
           id,
           content,
-          files,
+          files: JSON.stringify(files),
           flag,
           links: JSON.stringify(links),
           marks: JSON.stringify(marks),

@@ -55,7 +55,7 @@ const MarksSelector = (props: any) => {
         tasks: {
           id: task.id,
           content: task.content,
-          files: task.files,
+          files: JSON.stringify(task.files),
           flag: task.flag,
           links: JSON.stringify(task.links),
           // marks: JSON.stringify(marks.value),
@@ -107,7 +107,7 @@ const MarksSelector = (props: any) => {
         tasks: {
           id: task.id,
           content: task.content,
-          files: task.files,
+          files: JSON.stringify(task.files),
           flag: task.flag,
           links: JSON.stringify(task.links),
           // marks: JSON.stringify(marks.value),
