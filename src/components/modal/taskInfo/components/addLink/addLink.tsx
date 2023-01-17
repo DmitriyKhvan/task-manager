@@ -32,17 +32,21 @@ const AddLink = memo(
       // refetchQueries: [{ query: GET_COLUMNS }],
     });
 
-    //позиция таска в столбце
-    const orderTask = column?.taskIds.findIndex(
-      (taskId: any) => taskId === task.id
-    );
-
     const [disable, setDisable] = useState(true);
     const dispatch: any = useDispatch();
     const { editTask } = toDoSlice.actions;
-    const { tasks } = useSelector((state: any) => state.toDoReducer);
+    const { tasks, columns } = useSelector((state: any) => state.toDoReducer);
 
     const taskFind = tasks[task.id];
+
+    const columnFind: any = Object.values(columns).find((col: any) =>
+      col.taskIds.includes(taskFind.id)
+    );
+
+    //позиция таска в столбце
+    const orderTask = columnFind?.taskIds.findIndex(
+      (taskId: any) => taskId === taskFind.id
+    );
 
     const addLinkHandler: any = (data: any, form: any) => {
       const { url, text }: any = data;
@@ -66,7 +70,7 @@ const AddLink = memo(
             links: JSON.stringify(links),
             marks: JSON.stringify(taskFind.marks),
             nodes: JSON.stringify(taskFind.nodes),
-            columnId: column.id,
+            columnId: columnFind.id,
             order: orderTask,
           },
         },

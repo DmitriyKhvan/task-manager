@@ -28,8 +28,12 @@ const AddNote = memo(
 
     const taskFind = tasks[task.id];
 
+    const columnFind: any = Object.values(columns).find((col: any) =>
+      col.taskIds.includes(taskFind.id)
+    );
+
     const orderTask = column?.taskIds.findIndex(
-      (taskId: any) => taskId === task.id
+      (taskId: any) => taskId === taskFind.id
     );
 
     const addNote: any = (data: any, form: any) => {
@@ -54,7 +58,8 @@ const AddNote = memo(
             // marks: JSON.stringify(marks.value),
             marks: JSON.stringify(task.marks),
             nodes: JSON.stringify(nodes),
-            columnId: column.id,
+            // columnId: column.id,
+            columnId: columnFind.id,
             order: orderTask,
           },
         },
@@ -74,13 +79,13 @@ const AddNote = memo(
       }
     };
 
-    const changeNodeHandler = useCallback((event: any) => {
+    const changeNodeHandler = (event: any) => {
       if (event.target.value) {
         setDisable(false);
       } else {
         setDisable(true);
       }
-    }, []);
+    };
 
     const cancelAddNode = () => {
       setVisibleField(false);

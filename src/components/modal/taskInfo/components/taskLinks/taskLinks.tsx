@@ -16,23 +16,32 @@ import axios from "axios";
 
 const TaskLinks = memo(
   ({ task: { task, column, isOpen }, setVisibleAddLink }: any) => {
-    const img: any = useRef(null);
+    const imgsRef: any = useRef([]);
 
-    const { tasks } = useSelector((state: any) => state.toDoReducer);
+    const { tasks, columns } = useSelector((state: any) => state.toDoReducer);
     const dispatch = useDispatch();
     const { modalTaskEdit } = flagSlice.actions;
 
     const taskFind = tasks[task.id];
 
+    const columnFind: any = Object.values(columns).find((col: any) =>
+      col.taskIds.includes(taskFind.id)
+    );
+
+    const orderTask = columnFind?.taskIds.findIndex(
+      (taskId: any) => taskId === taskFind?.id
+    );
+
+    useEffect(() => {
+      imgsRef.current = imgsRef.current.slice(0, taskFind.links.length);
+    }, [taskFind.links]);
+
     const modalLinkHandler = (id: any) => {
       const links = taskFind.links.filter((link: any) => link.id !== id);
-      const orderTask = column?.taskIds.findIndex(
-        (taskId: any) => taskId === taskFind?.id
-      );
 
       const taskEdit = {
         id: taskFind.id,
-        columnId: column.id,
+        columnId: columnFind.id,
         content: taskFind.content,
         flag: taskFind.flag,
         links: JSON.stringify(links),
@@ -51,9 +60,9 @@ const TaskLinks = memo(
       );
     };
 
-    const errorImg = (e: any) => {
+    const errorImg = (e: any, idx: number) => {
       console.log("errorImg", e);
-      img.current.src = favicon;
+      imgsRef.current[idx].src = favicon;
     };
 
     return (
@@ -100,8 +109,8 @@ const TaskLinks = memo(
                       <img
                         className={styles.iconLink}
                         src={`${u.protocol}//${u.host}/favicon.ico`}
-                        ref={img}
-                        onError={errorImg}
+                        ref={(el) => (imgsRef.current[index] = el)}
+                        onError={(e) => errorImg(e, index)}
                       ></img>
                     </span>
                   </div>

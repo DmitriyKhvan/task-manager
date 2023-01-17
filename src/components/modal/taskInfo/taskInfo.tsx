@@ -70,7 +70,7 @@ import { ADD_TASK } from "../../../apollo/Mutation";
 import { updateStore } from "../../../utils/updateStore";
 import EditTask from "./components/editTask/editTask";
 import InfoTaskAccord from "./components/infoTaskAccord/infoTaskAccord";
-import ModalRemoveTaskItem from "../removeTaskLink/relmoveTaskItem";
+import ModalRemoveTaskItem from "../removeTaskItem/relmoveTaskItem";
 
 export default memo(function TaskInfo() {
   const [drag, setDrag] = useState(false);

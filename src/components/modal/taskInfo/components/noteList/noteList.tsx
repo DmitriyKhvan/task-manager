@@ -33,13 +33,17 @@ const NoteList = ({ task: { task, column, isOpen }, sort }: any) => {
     return { label: el.title, value: el.stage };
   });
 
-  //позиция таска в столбце
-  const orderTask = column?.taskIds.findIndex(
-    (taskId: any) => taskId === task.id
-  );
-
   const taskFind = tasks[task.id];
   let sortNodes: any = [];
+
+  const columnFind: any = Object.values(columns).find((col: any) =>
+    col.taskIds.includes(taskFind.id)
+  );
+
+  //позиция таска в столбце
+  const orderTask = columnFind?.taskIds.findIndex(
+    (taskId: any) => taskId === taskFind.id
+  );
 
   if (sort.value === "date") {
     sortNodes = taskFind.nodes.slice().sort((a: any, b: any) => {
@@ -80,14 +84,14 @@ const NoteList = ({ task: { task, column, isOpen }, sort }: any) => {
       addTaskQuery({
         variables: {
           tasks: {
-            id: task.id,
-            content: task.content,
-            files: JSON.stringify(task.files),
-            flag: task.flag,
-            links: JSON.stringify(task.links),
-            marks: JSON.stringify(task.marks),
+            id: taskFind.id,
+            content: taskFind.content,
+            files: JSON.stringify(taskFind.files),
+            flag: taskFind.flag,
+            links: JSON.stringify(taskFind.links),
+            marks: JSON.stringify(taskFind.marks),
             nodes: JSON.stringify(nodes),
-            columnId: column.id,
+            columnId: columnFind.id,
             order: orderTask,
           },
         },
@@ -95,7 +99,7 @@ const NoteList = ({ task: { task, column, isOpen }, sort }: any) => {
 
       dispatch(
         editTask({
-          taskId: task.id,
+          taskId: taskFind.id,
           data: nodes,
           dataName: "nodes",
         })
@@ -108,7 +112,7 @@ const NoteList = ({ task: { task, column, isOpen }, sort }: any) => {
 
     const taskEdit = {
       id: taskFind.id,
-      columnId: column.id,
+      columnId: columnFind.id,
       content: taskFind.content,
       flag: taskFind.flag,
       links: JSON.stringify(taskFind.links),
@@ -163,15 +167,15 @@ const NoteList = ({ task: { task, column, isOpen }, sort }: any) => {
     addTaskQuery({
       variables: {
         tasks: {
-          id: task.id,
-          content: task.content,
-          files: JSON.stringify(task.files),
-          flag: task.flag,
-          links: JSON.stringify(task.links),
+          id: taskFind.id,
+          content: taskFind.content,
+          files: JSON.stringify(taskFind.files),
+          flag: taskFind.flag,
+          links: JSON.stringify(taskFind.links),
           // marks: JSON.stringify(marks.value),
-          marks: JSON.stringify(task.marks),
+          marks: JSON.stringify(taskFind.marks),
           nodes: JSON.stringify(nodes),
-          columnId: column.id,
+          columnId: columnFind.id,
           order: orderTask,
         },
       },
@@ -179,7 +183,7 @@ const NoteList = ({ task: { task, column, isOpen }, sort }: any) => {
 
     dispatch(
       editTask({
-        taskId: task.id,
+        taskId: taskFind.id,
         data: nodes,
         dataName: "nodes",
       })

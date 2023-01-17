@@ -2,7 +2,7 @@ import { useMutation } from "@apollo/client";
 import InlineEdit from "@atlaskit/inline-edit";
 import TextArea from "@atlaskit/textarea";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { ADD_TASK } from "../../../../../apollo/Mutation";
 import { toDoSlice } from "../../../../../store/reducers/ToDoSlice";
 import { updateStore } from "../../../../../utils/updateStore";
@@ -17,12 +17,20 @@ const EditTask = (props: any) => {
     // refetchQueries: [{ query: GET_COLUMNS }],
   });
 
-  //позиция таска в столбце
-  const orderTask = column?.taskIds.findIndex(
-    (taskId: any) => taskId === task.id
+  const { tasks, columns } = useSelector((state: any) => state.toDoReducer);
+
+  const taskFind = tasks[task.id];
+
+  const columnFind: any = Object.values(columns).find((col: any) =>
+    col.taskIds.includes(taskFind.id)
   );
 
-  const [editContent, setEditContent] = useState(task.content);
+  //позиция таска в столбце
+  const orderTask = columnFind?.taskIds.findIndex(
+    (taskId: any) => taskId === taskFind.id
+  );
+
+  const [editContent, setEditContent] = useState(taskFind.content);
   const dispatch = useDispatch();
   const { editTask } = toDoSlice.actions;
 
@@ -31,7 +39,7 @@ const EditTask = (props: any) => {
       setEditContent(content);
       dispatch(
         editTask({
-          taskId: task.id,
+          taskId: taskFind.id,
           data: content,
           dataName: "content",
         })
@@ -40,14 +48,14 @@ const EditTask = (props: any) => {
       addTaskQuery({
         variables: {
           tasks: {
-            id: task.id,
+            id: taskFind.id,
             content: content,
-            files: JSON.stringify(task.files),
-            flag: task.flag,
-            links: JSON.stringify(task.links),
-            marks: JSON.stringify(task.marks),
-            nodes: JSON.stringify(task.nodes),
-            columnId: column.id,
+            files: JSON.stringify(taskFind.files),
+            flag: taskFind.flag,
+            links: JSON.stringify(taskFind.links),
+            marks: JSON.stringify(taskFind.marks),
+            nodes: JSON.stringify(taskFind.nodes),
+            columnId: columnFind.id,
             order: orderTask,
           },
         },
