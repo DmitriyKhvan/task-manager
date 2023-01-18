@@ -244,9 +244,9 @@ const ToDoList = () => {
           order: destination.index,
         },
       },
-    }),
-      /************************/
-      dispatch(setAddTaskBtnFlag(true));
+    });
+    /************************/
+    // dispatch(setAddTaskBtnFlag(true));
 
     if (title) {
       title.style.position = "sticky";
@@ -271,7 +271,7 @@ const ToDoList = () => {
   };
 
   const onBeforeDragStart = (result: any) => {
-    dispatch(setAddTaskBtnFlag(false));
+    // dispatch(setAddTaskBtnFlag(false));
   };
 
   const handleScroll = (event: any) => {

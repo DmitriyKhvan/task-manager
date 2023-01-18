@@ -15,9 +15,10 @@ import { updateStore } from "../../utils/updateStore";
 
 const AddTaskBtn = (props: any) => {
   const isActive = true;
+
   return (
     <Button
-      className={props.title !== "To do" ? "addBtn opacityBtn" : "addBtn"}
+      className={props.stage !== "to-do" ? "addBtn opacityBtn" : "addBtn"}
       iconBefore={<AddIcon label="add icon" size="small" />}
       appearance="subtle"
     >
@@ -91,7 +92,7 @@ const AddTask = (props: any) => {
             }}
           />
         )}
-        readView={() => <AddTaskBtn title={props.column.title}></AddTaskBtn>}
+        readView={() => <AddTaskBtn stage={props.column.stage}></AddTaskBtn>}
         onConfirm={(value) => {
           // setEditValue(value);
           // addTaskValue(value);

@@ -263,7 +263,7 @@ const Column = (props: any) => {
                 <InnerList column={props?.column} tasks={props?.tasks} />
                 {provided?.placeholder}
 
-                {(addTaskBtnFlag || props?.column?.title === "To do") &&
+                {(addTaskBtnFlag || props?.column?.stage === "to-do") &&
                 props?.column?.title !== "" ? (
                   <AddTask column={props?.column}></AddTask>
                 ) : (

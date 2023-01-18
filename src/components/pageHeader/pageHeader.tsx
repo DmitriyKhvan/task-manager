@@ -69,7 +69,7 @@ const PageHeaderComplex = () => {
         actions={actionsContent}
         bottomBar={<BarContent></BarContent>}
       >
-        Title describing what page content to expect
+        Управление проектами/задачими/заявками
       </PageHeader>
     </div>
   );
