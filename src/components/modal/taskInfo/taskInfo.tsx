@@ -71,6 +71,7 @@ import { updateStore } from "../../../utils/updateStore";
 import EditTask from "./components/editTask/editTask";
 import InfoTaskAccord from "./components/infoTaskAccord/infoTaskAccord";
 import ModalRemoveTaskItem from "../removeTaskItem/relmoveTaskItem";
+import EditorConvertToMarkdown from "../../comments/comments";
 
 export default memo(function TaskInfo() {
   const [drag, setDrag] = useState(false);

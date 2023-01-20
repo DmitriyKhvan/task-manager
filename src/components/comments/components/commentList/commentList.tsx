@@ -12,11 +12,11 @@ import Comment, {
 import styles from "./commentList.module.scss";
 
 export default function CommentList() {
-  const { comments } = useSelector((state) => state.toDoReducer);
+  const { comments } = useSelector((state: any) => state.toDoReducer);
 
   return (
     <div>
-      {comments.map((comment) => {
+      {comments.map((comment: any) => {
         return (
           <div className={styles.comment} key={comment.id}>
             <Comment
